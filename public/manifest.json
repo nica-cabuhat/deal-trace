@@ -1,0 +1,23 @@
+{
+  "id": "dealtrace-addin",
+  "version": "1.0.0",
+  "manifestVersion": "1.1",
+  "displayName": "DealTrace",
+  "description": "Analyzes email threads and surfaces deal intelligence for sales reps.",
+  "iconUrl": "/icon-32.png",
+  "highResolutionIconUrl": "/icon-64.png",
+  "supportUrl": "http://localhost:3000",
+  "defaultLocale": "en-US",
+  "hosts": [{ "name": "Mailbox" }],
+  "requirements": {
+    "sets": [{ "name": "Mailbox", "minVersion": "1.1" }]
+  },
+  "formSettings": {
+    "desktopSettings": {
+      "sourceLocation": "http://localhost:3000/taskpane",
+      "requestedHeight": 600
+    }
+  },
+  "permissions": "ReadWriteMailbox",
+  "validDomains": ["localhost"]
+}
