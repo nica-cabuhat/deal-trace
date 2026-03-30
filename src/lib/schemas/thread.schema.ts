@@ -11,6 +11,7 @@ export const EmailTagSchema = z.object({
   signal: z.string(),
   confidence: z.number().min(0).max(1),
   category: z.enum(["engagement", "urgency", "sentiment", "intent"]),
+  direction: z.enum(["positive", "negative", "neutral"]),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -27,6 +28,7 @@ export const EmailMessageSchema = z.object({
 export const ThreadTagSchema = z.object({
   pattern: z.string(),
   score: z.number().min(0).max(1),
+  direction: z.enum(["positive", "negative", "neutral"]),
   closeLikelihood: z.number().min(0).max(1).optional(),
 });
 

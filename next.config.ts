@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const tunnelHost = process.env.NEXTAUTH_URL?.replace(/^https?:\/\//, "");
+
+const nextConfig: NextConfig = {
+  allowedDevOrigins: tunnelHost ? [tunnelHost] : [],
+};
 
 export default nextConfig;
