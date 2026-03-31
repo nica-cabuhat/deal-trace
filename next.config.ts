@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
-const tunnelHost = process.env.NEXTAUTH_URL?.replace(/^https?:\/\//, "");
-
 const nextConfig: NextConfig = {
-  allowedDevOrigins: tunnelHost ? [tunnelHost] : [],
+  allowedDevOrigins: ["deal-trace-gse.vercel.app"],
 };
 
 export default nextConfig;

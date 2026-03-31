@@ -15,9 +15,9 @@
   <Description DefaultValue="Analyzes email threads and surfaces deal intelligence for sales reps." />
 
   <!-- Icons -->
-  <IconUrl DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/icon-64.png" />
-  <SupportUrl DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com" />
+  <IconUrl DefaultValue="https://deal-trace-gse.vercel.app//icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://deal-trace-gse.vercel.app//icon-64.png" />
+  <SupportUrl DefaultValue="https://deal-trace-gse.vercel.app/" />
 
   <!-- Outlook requirement -->
   <Requirements>
@@ -30,7 +30,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/taskpane" />
+        <SourceLocation DefaultValue="https://deal-trace-gse.vercel.app//taskpane" />
         <RequestedHeight>450</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -89,13 +89,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/icon-16.png" />
-        <bt:Image id="Icon.32x32" DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/icon-32.png" />
-        <bt:Image id="Icon.80x80" DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/icon-64.png" />
+        <bt:Image id="Icon.16x16" DefaultValue="https://deal-trace-gse.vercel.app//icon-16.png" />
+        <bt:Image id="Icon.32x32" DefaultValue="https://deal-trace-gse.vercel.app//icon-32.png" />
+        <bt:Image id="Icon.80x80" DefaultValue="https://deal-trace-gse.vercel.app//icon-64.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/taskpane" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://places-notes-opportunity-volt.trycloudflare.com/taskpane" />
+        <bt:Url id="Commands.Url" DefaultValue="https://deal-trace-gse.vercel.app//taskpane" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://deal-trace-gse.vercel.app//taskpane" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="DealTrace" />
