@@ -16,7 +16,7 @@ export function useConversationThread(
     queryFn: async (): Promise<ConversationResult> => {
       const params = new URLSearchParams();
       if (conversationId) params.set("conversationId", conversationId);
-      else if (subject) params.set("subject", subject);
+      if (subject) params.set("subject", subject);
 
       const res = await fetch(`/api/graph/conversation?${params.toString()}`);
 

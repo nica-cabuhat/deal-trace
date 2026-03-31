@@ -15,6 +15,40 @@ import TagBadge from "@/components/playbook/TagBadge";
 
 const baseThreads = groupIntoThreads(rawMessages as unknown as EmailMessage[]);
 
+/** Strip Exchange legacy DN paths from sender display names. */
+function cleanName(raw: string): string {
+  return raw.replace(/\s*<?\/?O=.*$/i, "").trim() || raw;
+}
+
+function isEmail(addr: string): boolean {
+  return addr.includes("@");
+}
+
+const DEAL_KEYWORDS =
+  /\b(sophos|intercept\s*x|mdr|xdr|firewall|central|endpoint|ztna|cyber\s*security|threat|ransomware|migration|license|renewal|proof\s*of\s*concept|poc|demo|pricing|quote)\b/i;
+
+const SYSTEM_SENDERS =
+  /\b(noreply|no-reply|account-security|mailer-daemon|postmaster|notifications?|support@|billing@|newsletter)\b/i;
+
+function isDealEmail(thread: EmailThread): boolean {
+  for (const m of thread.messages) {
+    if (DEAL_KEYWORDS.test(m.subject) || DEAL_KEYWORDS.test(m.bodyPreview)) {
+      return true;
+    }
+  }
+
+  const allSystem = thread.messages.every((m) => {
+    const addr = m.from.emailAddress.address.toLowerCase();
+    return (
+      SYSTEM_SENDERS.test(addr) ||
+      addr.endsWith("@microsoft.com") ||
+      addr.endsWith("@accountprotection.microsoft.com")
+    );
+  });
+
+  return !allSystem;
+}
+
 function DevMailboxHint() {
   return (
     <p
@@ -71,10 +105,12 @@ function MessageRow({ message }: { message: EmailMessage }) {
     >
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
         <span className="text-xs font-medium" style={{ color: "var(--color-gray-800)" }}>
-          {message.from.emailAddress.name}
-          <span className="ml-1 font-normal" style={{ color: "var(--color-gray-500)" }}>
-            &lt;{message.from.emailAddress.address}&gt;
-          </span>
+          {cleanName(message.from.emailAddress.name)}
+          {isEmail(message.from.emailAddress.address) && (
+            <span className="ml-1 font-normal" style={{ color: "var(--color-gray-500)" }}>
+              &lt;{message.from.emailAddress.address}&gt;
+            </span>
+          )}
         </span>
         <span className="shrink-0 text-xs" style={{ color: "var(--color-gray-450)" }}>
           {date}
@@ -132,10 +168,12 @@ function SelectedThreadCard({ thread }: { thread: EmailThread }) {
           </div>
           {thread.messages[0] && (
             <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-500)" }}>
-              {thread.messages[0].from.emailAddress.name}
-              <span className="ml-1 opacity-70">
-                &lt;{thread.messages[0].from.emailAddress.address}&gt;
-              </span>
+              {cleanName(thread.messages[0].from.emailAddress.name)}
+              {isEmail(thread.messages[0].from.emailAddress.address) && (
+                <span className="ml-1 opacity-70">
+                  &lt;{thread.messages[0].from.emailAddress.address}&gt;
+                </span>
+              )}
               <span className="ml-1 opacity-50">
                 · {thread.messages.length} message
                 {thread.messages.length !== 1 ? "s" : ""}
@@ -185,6 +223,7 @@ export default function SamplePage() {
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
   // ── State B: live thread from real Outlook conversation ────────────────────
+  const [selectedIsDeal, setSelectedIsDeal] = useState<boolean | null>(null);
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
   const [liveHealth, setLiveHealth] = useState<ThreadHealth | null>(null);
   const [isLiveAnalyzing, setIsLiveAnalyzing] = useState(false);
@@ -210,6 +249,7 @@ export default function SamplePage() {
     onConversationChanged: () => {
       setLiveThread(null);
       setLiveHealth(null);
+      setSelectedIsDeal(null);
       lastLiveConvId.current = null;
     },
   });
@@ -255,6 +295,7 @@ export default function SamplePage() {
       if (!isLoadingConversation && lastLiveConvId.current) {
         setLiveThread(null);
         setLiveHealth(null);
+        setSelectedIsDeal(null);
         lastLiveConvId.current = null;
       }
       return;
@@ -264,6 +305,15 @@ export default function SamplePage() {
     lastLiveConvId.current = fetchedThread.conversationId;
     setLiveHealth(null);
     setLiveProjectedScore(undefined);
+
+    const deal = isDealEmail(fetchedThread);
+    setSelectedIsDeal(deal);
+
+    if (!deal) {
+      setLiveThread(null);
+      setIsLiveAnalyzing(false);
+      return;
+    }
 
     const run = async () => {
       setIsLiveAnalyzing(true);
@@ -366,8 +416,12 @@ export default function SamplePage() {
     [scoreThread],
   );
 
-  // ── STATE B: real Outlook conversation selected ────────────────────────────
-  if (hasMailboxContext) {
+  // ── Determine which state to render ─────────────────────────────────────────
+  const showStateB =
+    hasMailboxContext && selectedIsDeal === true && !isUnauthorized;
+
+  // ── STATE B: active deal thread selected ──────────────────────────────────
+  if (showStateB) {
     if (isLoadingConversation || isLiveAnalyzing) {
       return (
         <div
@@ -385,42 +439,6 @@ export default function SamplePage() {
                 ? "Loading conversation from Outlook…"
                 : "Analyzing deal signals…"}
             </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (isUnauthorized) {
-      return (
-        <div
-          className="flex min-h-screen flex-col"
-          style={{ background: "var(--color-gray-50)" }}
-        >
-          <AppHeader />
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.5C16.5 22.15 20 17.25 20 12V6L12 2z"
-                stroke="var(--color-gray-300)"
-                strokeWidth="1.5"
-                fill="none"
-              />
-              <path d="M12 8v4M12 14h.01" stroke="var(--color-gray-400)" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <p className="text-sm font-medium" style={{ color: "var(--color-gray-700)" }}>
-              Sign in to analyze this thread
-            </p>
-            <p className="text-xs" style={{ color: "var(--color-gray-450)" }}>
-              DealTrace needs access to your mailbox to read the full conversation.
-            </p>
-            <button
-              type="button"
-              onClick={handleSignIn}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ background: "var(--color-sophos-blue)" }}
-            >
-              Sign in with Microsoft
-            </button>
           </div>
         </div>
       );
@@ -486,17 +504,60 @@ export default function SamplePage() {
         </div>
       );
     }
+  }
 
+  // ── Loading / auth states ─────────────────────────────────────────────────
+  if (hasMailboxContext && isLoadingConversation && selectedIsDeal === null) {
     return (
       <div
         className="flex min-h-screen flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
         <AppHeader />
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+            style={{ borderColor: "var(--color-sophos-blue)", borderTopColor: "transparent" }}
+          />
           <p className="text-sm" style={{ color: "var(--color-gray-500)" }}>
-            No conversation data found for the selected email.
+            Loading conversation…
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasMailboxContext && isUnauthorized) {
+    return (
+      <div
+        className="flex min-h-screen flex-col"
+        style={{ background: "var(--color-gray-50)" }}
+      >
+        <AppHeader />
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.5C16.5 22.15 20 17.25 20 12V6L12 2z"
+              stroke="var(--color-gray-300)"
+              strokeWidth="1.5"
+              fill="none"
+            />
+            <path d="M12 8v4M12 14h.01" stroke="var(--color-gray-400)" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <p className="text-sm font-medium" style={{ color: "var(--color-gray-700)" }}>
+            Sign in to analyze this thread
+          </p>
+          <p className="text-xs" style={{ color: "var(--color-gray-450)" }}>
+            DealTrace needs access to your mailbox to read the full conversation.
+          </p>
+          <button
+            type="button"
+            onClick={handleSignIn}
+            className="rounded-md px-4 py-2 text-sm font-medium text-white"
+            style={{ background: "var(--color-sophos-blue)" }}
+          >
+            Sign in with Microsoft
+          </button>
         </div>
       </div>
     );

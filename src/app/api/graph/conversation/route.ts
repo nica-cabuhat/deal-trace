@@ -14,6 +14,24 @@ function stripReplyPrefixes(s: string): string {
   return s.replace(/^(?:(?:RE|FW|FWD)\s*:\s*)+/i, "").trim();
 }
 
+/**
+ * Pick the largest group of messages that share a conversationId.
+ * Handles the case where Office.js and Graph API use different IDs.
+ */
+function pickLargestThread(msgs: EmailMessage[]): EmailMessage[] {
+  const groups = new Map<string, EmailMessage[]>();
+  for (const m of msgs) {
+    const arr = groups.get(m.conversationId) ?? [];
+    arr.push(m);
+    groups.set(m.conversationId, arr);
+  }
+  let best: EmailMessage[] = [];
+  for (const group of groups.values()) {
+    if (group.length > best.length) best = group;
+  }
+  return best;
+}
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -36,7 +54,7 @@ export async function GET(req: NextRequest) {
 
   let messages: EmailMessage[] = [];
 
-  // Strategy 1: $filter (works for work/school accounts)
+  // Strategy 1: $filter by conversationId (works for work/school accounts)
   if (conversationId) {
     try {
       const raw = await client
@@ -56,7 +74,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Strategy 2: $search by subject, filter by conversationId server-side
+  // Strategy 2: $search by subject (works for personal accounts)
   if (messages.length === 0 && subject) {
     const baseSubject = stripReplyPrefixes(subject)
       .split(/[\u2014\u2013|]/)[0]
@@ -71,24 +89,30 @@ export async function GET(req: NextRequest) {
         .get();
 
       const parsed = RawMessagesSchema.safeParse(raw);
-      if (parsed.success) {
-        messages = conversationId
-          ? parsed.data.value.filter((m) => m.conversationId === conversationId)
-          : parsed.data.value;
+      if (parsed.success && parsed.data.value.length > 0) {
+        const all = parsed.data.value;
+
+        // Try matching by conversationId first
+        if (conversationId) {
+          const exact = all.filter((m) => m.conversationId === conversationId);
+          messages = exact.length > 0 ? exact : pickLargestThread(all);
+        } else {
+          messages = pickLargestThread(all);
+        }
       }
     } catch (err) {
       console.error("[graph/conversation] Search fallback failed", err);
     }
   }
 
-  // Strategy 3: broad search if conversationId-only request failed
-  if (messages.length === 0 && conversationId && !subject) {
+  // Strategy 3: broad fetch of recent messages
+  if (messages.length === 0 && conversationId) {
     try {
       const raw = await client
         .api("/me/messages")
         .select(fields)
         .orderby("receivedDateTime desc")
-        .top(100)
+        .top(200)
         .get();
 
       const parsed = RawMessagesSchema.safeParse(raw);
@@ -109,7 +133,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Sort chronologically (search results aren't ordered)
   messages.sort(
     (a, b) =>
       new Date(a.receivedDateTime).getTime() -
