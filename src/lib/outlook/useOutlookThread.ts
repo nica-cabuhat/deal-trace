@@ -11,6 +11,8 @@ interface OutlookThreadResult {
   isOfficeUnavailable: boolean;
 }
 
+/* ── helpers ─────────────────────────────────────────────────────────────── */
+
 function getCallbackToken(): Promise<string | null> {
   return new Promise((resolve) => {
     if (typeof Office === "undefined" || !Office.context?.mailbox) {
@@ -37,14 +39,187 @@ function getCallbackToken(): Promise<string | null> {
 
 function getRestUrl(): string | null {
   if (typeof Office === "undefined" || !Office.context?.mailbox) return null;
-  return (Office.context.mailbox as Office.Mailbox & { restUrl?: string })
-    .restUrl ?? null;
+  return (
+    (Office.context.mailbox as Office.Mailbox & { restUrl?: string }).restUrl ??
+    null
+  );
 }
 
-/**
- * Reads the currently selected email directly from Office.js item properties.
- * Used as a fallback when the Outlook REST API is unavailable (personal accounts).
- */
+function stripReplyPrefixes(subject: string): string {
+  return subject.replace(/^(?:(?:RE|FW|FWD)\s*:\s*)+/i, "").trim();
+}
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function safeIsoDate(raw: string): string {
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+
+/* ── Strategy 1: Outlook REST API (work/school accounts) ────────────────── */
+
+async function fetchViaRestApi(
+  conversationId: string,
+  token: string,
+  restUrl: string,
+): Promise<EmailThread | null> {
+  const res = await fetch("/api/outlook/conversation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, restUrl, conversationId }),
+  });
+
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`REST ${res.status}`);
+
+  const data = await res.json();
+  return EmailThreadSchema.parse(data.thread);
+}
+
+/* ── Strategy 2: EWS FindItem via makeEwsRequestAsync ───────────────────── */
+
+function findConversationViaEws(
+  conversationId: string,
+  subject: string,
+): Promise<EmailThread | null> {
+  return new Promise((resolve) => {
+    if (
+      typeof Office === "undefined" ||
+      !Office.context?.mailbox ||
+      typeof Office.context.mailbox.makeEwsRequestAsync !== "function"
+    ) {
+      resolve(null);
+      return;
+    }
+
+    const baseSubject = escapeXml(stripReplyPrefixes(subject));
+
+    const soap = [
+      '<?xml version="1.0" encoding="utf-8"?>',
+      '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+      '  xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages"',
+      '  xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"',
+      '  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">',
+      "<soap:Header>",
+      '  <t:RequestServerVersion Version="Exchange2013"/>',
+      "</soap:Header>",
+      "<soap:Body>",
+      '  <m:FindItem Traversal="Shallow">',
+      "    <m:ItemShape>",
+      "      <t:BaseShape>Default</t:BaseShape>",
+      "      <t:AdditionalProperties>",
+      '        <t:FieldURI FieldURI="item:Subject"/>',
+      '        <t:FieldURI FieldURI="item:DateTimeReceived"/>',
+      '        <t:FieldURI FieldURI="message:From"/>',
+      '        <t:FieldURI FieldURI="item:Preview"/>',
+      "      </t:AdditionalProperties>",
+      "    </m:ItemShape>",
+      '    <m:IndexedPageItemView MaxEntriesReturned="50" Offset="0" BasePoint="Beginning"/>',
+      "    <m:Restriction>",
+      '      <t:Contains ContainmentMode="Substring" ContainmentComparison="IgnoreCase">',
+      '        <t:FieldURI FieldURI="item:Subject"/>',
+      `        <t:Constant Value="${baseSubject}"/>`,
+      "      </t:Contains>",
+      "    </m:Restriction>",
+      "    <m:SortOrder>",
+      '      <t:FieldOrder Order="Ascending">',
+      '        <t:FieldURI FieldURI="item:DateTimeReceived"/>',
+      "      </t:FieldOrder>",
+      "    </m:SortOrder>",
+      "    <m:ParentFolderIds>",
+      '      <t:DistinguishedFolderId Id="inbox"/>',
+      '      <t:DistinguishedFolderId Id="sentitems"/>',
+      "    </m:ParentFolderIds>",
+      "  </m:FindItem>",
+      "</soap:Body>",
+      "</soap:Envelope>",
+    ].join("\n");
+
+    Office.context.mailbox.makeEwsRequestAsync(soap, (result) => {
+      if (result.status !== Office.AsyncResultStatus.Succeeded) {
+        console.warn("[EWS] FindItem failed:", result.error);
+        resolve(null);
+        return;
+      }
+
+      try {
+        const doc = new DOMParser().parseFromString(result.value, "text/xml");
+        const ns =
+          "http://schemas.microsoft.com/exchange/services/2006/types";
+        const nodes = doc.getElementsByTagNameNS(ns, "Message");
+
+        if (nodes.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const messages: EmailMessage[] = [];
+
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          const tag = (t: string) =>
+            node.getElementsByTagNameNS(ns, t)[0]?.textContent ?? "";
+
+          const itemId =
+            node
+              .getElementsByTagNameNS(ns, "ItemId")[0]
+              ?.getAttribute("Id") ?? crypto.randomUUID();
+
+          const fromMailbox = node
+            .getElementsByTagNameNS(ns, "From")[0]
+            ?.getElementsByTagNameNS(ns, "Mailbox")[0];
+
+          messages.push({
+            id: itemId,
+            conversationId,
+            subject: tag("Subject") || subject,
+            from: {
+              emailAddress: {
+                name:
+                  fromMailbox
+                    ?.getElementsByTagNameNS(ns, "Name")[0]
+                    ?.textContent ?? "Unknown",
+                address:
+                  fromMailbox
+                    ?.getElementsByTagNameNS(ns, "EmailAddress")[0]
+                    ?.textContent ?? "unknown@unknown.com",
+              },
+            },
+            receivedDateTime: safeIsoDate(
+              tag("DateTimeReceived") || new Date().toISOString(),
+            ),
+            bodyPreview: tag("Preview"),
+          });
+        }
+
+        messages.sort(
+          (a, b) =>
+            new Date(a.receivedDateTime).getTime() -
+            new Date(b.receivedDateTime).getTime(),
+        );
+
+        resolve({
+          conversationId,
+          subject: stripReplyPrefixes(subject),
+          messages,
+        });
+      } catch (err) {
+        console.error("[EWS] XML parse error:", err);
+        resolve(null);
+      }
+    });
+  });
+}
+
+/* ── Strategy 3: read the single currently-selected item ────────────────── */
+
 function readCurrentItem(): Promise<EmailThread | null> {
   return new Promise((resolve) => {
     if (typeof Office === "undefined" || !Office.context?.mailbox?.item) {
@@ -81,13 +256,9 @@ function readCurrentItem(): Promise<EmailThread | null> {
           bodyPreview: bodyText.slice(0, 500),
         };
 
-        resolve({
-          conversationId: convId,
-          subject,
-          messages: [message],
-        });
+        resolve({ conversationId: convId, subject, messages: [message] });
       } catch (err) {
-        console.error("[readCurrentItem] Error constructing thread:", err);
+        console.error("[readCurrentItem] Error:", err);
         resolve(null);
       }
     };
@@ -109,50 +280,47 @@ function readCurrentItem(): Promise<EmailThread | null> {
   });
 }
 
+/* ── hook ────────────────────────────────────────────────────────────────── */
+
 /**
- * Fetches the conversation thread from Outlook. Tries the REST API first
- * (works for work/school accounts), then falls back to reading the current
- * mail item directly from Office.js (works for all account types).
+ * Fetches the conversation thread from Outlook using a 3-tier strategy:
+ *   1. REST API (work/school accounts with `getCallbackTokenAsync`)
+ *   2. EWS `FindItem` via `makeEwsRequestAsync` (all account types)
+ *   3. Read the single selected item from Office.js (last resort)
  */
 export function useOutlookThread(
   conversationId: string | null | undefined,
+  subject: string | null | undefined,
   isOfficeReady: boolean,
 ) {
   return useQuery<OutlookThreadResult>({
     queryKey: ["outlook-thread", conversationId ?? null],
     queryFn: async (): Promise<OutlookThreadResult> => {
+      /* 1. REST API */
       const token = await getCallbackToken();
       const restUrl = getRestUrl();
 
-      if (token && restUrl) {
+      if (token && restUrl && conversationId) {
         try {
-          const res = await fetch("/api/outlook/conversation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token, restUrl, conversationId }),
-          });
-
-          if (res.status === 404) {
-            return { thread: null, isOfficeUnavailable: false };
-          }
-
-          if (res.ok) {
-            const data = await res.json();
-            const thread = EmailThreadSchema.parse(data.thread);
-            return { thread, isOfficeUnavailable: false };
-          }
-
-          console.warn(
-            `[useOutlookThread] REST API returned ${res.status}, falling back to item read`,
-          );
+          const thread = await fetchViaRestApi(conversationId, token, restUrl);
+          if (thread) return { thread, isOfficeUnavailable: false };
         } catch (err) {
-          console.warn("[useOutlookThread] REST API error, falling back:", err);
+          console.warn("[useOutlookThread] REST failed, trying EWS:", err);
         }
       }
 
-      const fallbackThread = await readCurrentItem();
-      if (fallbackThread) {
-        return { thread: fallbackThread, isOfficeUnavailable: false };
+      /* 2. EWS FindItem */
+      if (conversationId && subject) {
+        const ewsThread = await findConversationViaEws(conversationId, subject);
+        if (ewsThread) {
+          return { thread: ewsThread, isOfficeUnavailable: false };
+        }
+      }
+
+      /* 3. Read current item */
+      const singleItem = await readCurrentItem();
+      if (singleItem) {
+        return { thread: singleItem, isOfficeUnavailable: false };
       }
 
       return { thread: null, isOfficeUnavailable: true };

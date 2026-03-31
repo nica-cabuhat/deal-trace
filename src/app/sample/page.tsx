@@ -225,11 +225,11 @@ export default function SamplePage() {
   const mailboxSubject = officeSubject ?? urlMailboxSubject;
   const hasMailboxContext = !!(mailboxConversationId || mailboxSubject);
 
-  // Fetch the REAL conversation from Outlook using Office.js callback token
+  // Fetch the REAL conversation from Outlook (REST → EWS → single item)
   const {
     data: conversationResult,
     isLoading: isLoadingConversation,
-  } = useOutlookThread(mailboxConversationId, isOfficeReady);
+  } = useOutlookThread(mailboxConversationId, mailboxSubject, isOfficeReady);
 
   const fetchedThread = conversationResult?.thread ?? null;
   const isOfficeUnavailable = conversationResult?.isOfficeUnavailable ?? false;
