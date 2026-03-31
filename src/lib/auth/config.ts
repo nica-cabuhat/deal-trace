@@ -2,6 +2,17 @@ import AzureADProvider from "next-auth/providers/azure-ad";
 import type { NextAuthOptions } from "next-auth";
 import { env } from "@/lib/schemas/env.schema";
 
+/**
+ * All cookies use SameSite=None so the session set during popup sign-in
+ * is accessible from the Outlook iframe (third-party context).
+ */
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: "none" as const,
+  secure: true,
+  path: "/",
+};
+
 export const authOptions: NextAuthOptions = {
   providers: [
     AzureADProvider({
@@ -15,14 +26,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  events: {
-    async signIn(message) {
-      console.log("[signIn event]", message);
-    },
-    async session(message) {
-      console.log("[session event]", message);
-    },
-  },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
@@ -39,16 +42,19 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  pages: {
-    signIn: "/taskpane",
-  },
-  logger: {
-    error(code, metadata) {
-      console.error("[nextauth error]", code, metadata);
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: COOKIE_OPTS,
     },
-    warn(code) {
-      console.warn("[nextauth warn]", code);
+    callbackUrl: {
+      name: "__Secure-next-auth.callback-url",
+      options: COOKIE_OPTS,
+    },
+    csrfToken: {
+      name: "__Host-next-auth.csrf-token",
+      options: COOKIE_OPTS,
     },
   },
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
 };

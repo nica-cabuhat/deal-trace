@@ -8,7 +8,7 @@ import { groupIntoThreads } from "@/lib/graph/groupThreads";
 import { useMailboxConversation } from "@/lib/outlook/useMailboxConversation";
 import { useAnalyze } from "@/lib/queries/useAnalyze";
 import { useScore, type ThreadHealth } from "@/lib/queries/useScore";
-import { useOutlookThread } from "@/lib/outlook/useOutlookThread";
+import { useConversationThread } from "@/lib/queries/useConversationThread";
 import ThreadList from "@/components/playbook/ThreadList";
 import ThreadScore from "@/components/playbook/ThreadScore";
 import TagBadge from "@/components/playbook/TagBadge";
@@ -206,7 +206,6 @@ export default function SamplePage() {
   const {
     conversationId: officeConversationId,
     itemSubject: officeSubject,
-    isOfficeReady,
   } = useMailboxConversation({
     onConversationChanged: () => {
       setLiveThread(null);
@@ -225,14 +224,30 @@ export default function SamplePage() {
   const mailboxSubject = officeSubject ?? urlMailboxSubject;
   const hasMailboxContext = !!(mailboxConversationId || mailboxSubject);
 
-  // Fetch the REAL conversation from Outlook (REST → EWS → single item)
+  // Fetch conversation from Microsoft Graph API
   const {
     data: conversationResult,
     isLoading: isLoadingConversation,
-  } = useOutlookThread(mailboxConversationId, mailboxSubject, isOfficeReady);
+    refetch: refetchConversation,
+  } = useConversationThread(mailboxConversationId, mailboxSubject);
 
   const fetchedThread = conversationResult?.thread ?? null;
-  const isOfficeUnavailable = conversationResult?.isOfficeUnavailable ?? false;
+  const isUnauthorized = conversationResult?.isUnauthorized ?? false;
+
+  const handleSignIn = useCallback(() => {
+    const popup = window.open(
+      "/api/auth/signin/azure-ad?callbackUrl=/auth-complete",
+      "dealtrace-auth",
+      "width=500,height=700,popup=1",
+    );
+    if (!popup) return;
+    const poll = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(poll);
+        void refetchConversation();
+      }
+    }, 500);
+  }, [refetchConversation]);
 
   // ── Auto-analyze & score the live thread when it arrives ───────────────────
   useEffect(() => {
@@ -375,7 +390,7 @@ export default function SamplePage() {
       );
     }
 
-    if (isOfficeUnavailable) {
+    if (isUnauthorized) {
       return (
         <div
           className="flex min-h-screen flex-col"
@@ -393,13 +408,19 @@ export default function SamplePage() {
               <path d="M12 8v4M12 14h.01" stroke="var(--color-gray-400)" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             <p className="text-sm font-medium" style={{ color: "var(--color-gray-700)" }}>
-              Office context not available
+              Sign in to analyze this thread
             </p>
             <p className="text-xs" style={{ color: "var(--color-gray-450)" }}>
-              Open DealTrace from the Outlook taskpane to analyze the selected email thread.
-              On the <code className="font-mono">/sample</code> page, use{" "}
-              <code className="font-mono">?conv=…</code> to simulate.
+              DealTrace needs access to your mailbox to read the full conversation.
             </p>
+            <button
+              type="button"
+              onClick={handleSignIn}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white"
+              style={{ background: "var(--color-sophos-blue)" }}
+            >
+              Sign in with Microsoft
+            </button>
           </div>
         </div>
       );
