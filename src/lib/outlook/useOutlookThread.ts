@@ -13,7 +13,7 @@ interface OutlookThreadResult {
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
 
-function getCallbackToken(): Promise<string | null> {
+function getRestToken(): Promise<string | null> {
   return new Promise((resolve) => {
     if (typeof Office === "undefined" || !Office.context?.mailbox) {
       resolve(null);
@@ -29,7 +29,30 @@ function getCallbackToken(): Promise<string | null> {
         ) {
           resolve(result.value);
         } else {
-          console.warn("[useOutlookThread] getCallbackTokenAsync failed:", result.error);
+          console.warn("[outlook] REST token failed:", result.error);
+          resolve(null);
+        }
+      },
+    );
+  });
+}
+
+function getEwsToken(): Promise<string | null> {
+  return new Promise((resolve) => {
+    if (typeof Office === "undefined" || !Office.context?.mailbox) {
+      resolve(null);
+      return;
+    }
+
+    Office.context.mailbox.getCallbackTokenAsync(
+      (result: Office.AsyncResult<string>) => {
+        if (
+          result.status === Office.AsyncResultStatus.Succeeded &&
+          result.value
+        ) {
+          resolve(result.value);
+        } else {
+          console.warn("[outlook] EWS token failed:", result.error);
           resolve(null);
         }
       },
@@ -45,8 +68,21 @@ function getRestUrl(): string | null {
   );
 }
 
+function getEwsUrl(): string | null {
+  if (typeof Office === "undefined" || !Office.context?.mailbox) return null;
+  const url = Office.context.mailbox.ewsUrl;
+  return typeof url === "string" && url.length > 0 ? url : null;
+}
+
 function stripReplyPrefixes(subject: string): string {
   return subject.replace(/^(?:(?:RE|FW|FWD)\s*:\s*)+/i, "").trim();
+}
+
+/** Truncate at em dash / en dash / pipe to keep only ASCII for EWS search. */
+function getSearchableSubject(subject: string): string {
+  const base = stripReplyPrefixes(subject);
+  const truncated = base.split(/[\u2014\u2013|]/)[0].trim();
+  return truncated || base;
 }
 
 function escapeXml(str: string): string {
@@ -83,9 +119,33 @@ async function fetchViaRestApi(
   return EmailThreadSchema.parse(data.thread);
 }
 
-/* ── Strategy 2: EWS FindItem via makeEwsRequestAsync ───────────────────── */
+/* ── Strategy 2: Server-side EWS (token from getCallbackTokenAsync) ─────── */
 
-function findConversationViaEws(
+async function fetchViaServerEws(
+  ewsToken: string,
+  ewsUrl: string,
+  subject: string,
+  conversationId: string,
+): Promise<EmailThread | null> {
+  const res = await fetch("/api/outlook/ews-thread", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ewsToken, ewsUrl, subject, conversationId }),
+  });
+
+  if (!res.ok) {
+    console.warn(`[outlook] Server EWS returned ${res.status}`);
+    return null;
+  }
+
+  const data = await res.json();
+  if (!data.thread) return null;
+  return EmailThreadSchema.parse(data.thread);
+}
+
+/* ── Strategy 3: Client-side EWS via makeEwsRequestAsync ────────────────── */
+
+function findConversationViaClientEws(
   conversationId: string,
   subject: string,
 ): Promise<EmailThread | null> {
@@ -99,7 +159,7 @@ function findConversationViaEws(
       return;
     }
 
-    const baseSubject = escapeXml(stripReplyPrefixes(subject));
+    const searchSubject = escapeXml(getSearchableSubject(subject));
 
     const soap = [
       '<?xml version="1.0" encoding="utf-8"?>',
@@ -125,7 +185,7 @@ function findConversationViaEws(
       "    <m:Restriction>",
       '      <t:Contains ContainmentMode="Substring" ContainmentComparison="IgnoreCase">',
       '        <t:FieldURI FieldURI="item:Subject"/>',
-      `        <t:Constant Value="${baseSubject}"/>`,
+      `        <t:Constant Value="${searchSubject}"/>`,
       "      </t:Contains>",
       "    </m:Restriction>",
       "    <m:SortOrder>",
@@ -144,7 +204,7 @@ function findConversationViaEws(
 
     Office.context.mailbox.makeEwsRequestAsync(soap, (result) => {
       if (result.status !== Office.AsyncResultStatus.Succeeded) {
-        console.warn("[EWS] FindItem failed:", result.error);
+        console.warn("[EWS client] FindItem failed:", result.error);
         resolve(null);
         return;
       }
@@ -156,6 +216,7 @@ function findConversationViaEws(
         const nodes = doc.getElementsByTagNameNS(ns, "Message");
 
         if (nodes.length === 0) {
+          console.warn("[EWS client] 0 messages found");
           resolve(null);
           return;
         }
@@ -164,8 +225,8 @@ function findConversationViaEws(
 
         for (let i = 0; i < nodes.length; i++) {
           const node = nodes[i];
-          const tag = (t: string) =>
-            node.getElementsByTagNameNS(ns, t)[0]?.textContent ?? "";
+          const t = (name: string) =>
+            node.getElementsByTagNameNS(ns, name)[0]?.textContent ?? "";
 
           const itemId =
             node
@@ -179,7 +240,7 @@ function findConversationViaEws(
           messages.push({
             id: itemId,
             conversationId,
-            subject: tag("Subject") || subject,
+            subject: t("Subject") || subject,
             from: {
               emailAddress: {
                 name:
@@ -193,9 +254,9 @@ function findConversationViaEws(
               },
             },
             receivedDateTime: safeIsoDate(
-              tag("DateTimeReceived") || new Date().toISOString(),
+              t("DateTimeReceived") || new Date().toISOString(),
             ),
-            bodyPreview: tag("Preview"),
+            bodyPreview: t("Preview"),
           });
         }
 
@@ -211,14 +272,14 @@ function findConversationViaEws(
           messages,
         });
       } catch (err) {
-        console.error("[EWS] XML parse error:", err);
+        console.error("[EWS client] Parse error:", err);
         resolve(null);
       }
     });
   });
 }
 
-/* ── Strategy 3: read the single currently-selected item ────────────────── */
+/* ── Strategy 4: read the single currently-selected item ────────────────── */
 
 function readCurrentItem(): Promise<EmailThread | null> {
   return new Promise((resolve) => {
@@ -232,7 +293,7 @@ function readCurrentItem(): Promise<EmailThread | null> {
     const finish = (bodyText: string) => {
       try {
         const from = item.from;
-        const subject = item.subject ?? "No Subject";
+        const subj = item.subject ?? "No Subject";
         const created = item.dateTimeCreated;
         const convId =
           (item as unknown as { conversationId?: string }).conversationId ??
@@ -243,7 +304,7 @@ function readCurrentItem(): Promise<EmailThread | null> {
         const message: EmailMessage = {
           id: itemId,
           conversationId: convId,
-          subject,
+          subject: subj,
           from: {
             emailAddress: {
               name: from?.displayName ?? "Unknown",
@@ -256,7 +317,7 @@ function readCurrentItem(): Promise<EmailThread | null> {
           bodyPreview: bodyText.slice(0, 500),
         };
 
-        resolve({ conversationId: convId, subject, messages: [message] });
+        resolve({ conversationId: convId, subject: subj, messages: [message] });
       } catch (err) {
         console.error("[readCurrentItem] Error:", err);
         resolve(null);
@@ -283,10 +344,11 @@ function readCurrentItem(): Promise<EmailThread | null> {
 /* ── hook ────────────────────────────────────────────────────────────────── */
 
 /**
- * Fetches the conversation thread from Outlook using a 3-tier strategy:
- *   1. REST API (work/school accounts with `getCallbackTokenAsync`)
- *   2. EWS `FindItem` via `makeEwsRequestAsync` (all account types)
- *   3. Read the single selected item from Office.js (last resort)
+ * Fetches the conversation thread from Outlook using a 4-tier strategy:
+ *   1. REST API (`getCallbackTokenAsync` with `isRest: true`)
+ *   2. Server-side EWS (`getCallbackTokenAsync` without isRest + ewsUrl)
+ *   3. Client-side EWS (`makeEwsRequestAsync`)
+ *   4. Read the single selected item from Office.js (last resort)
  */
 export function useOutlookThread(
   conversationId: string | null | undefined,
@@ -297,27 +359,50 @@ export function useOutlookThread(
     queryKey: ["outlook-thread", conversationId ?? null],
     queryFn: async (): Promise<OutlookThreadResult> => {
       /* 1. REST API */
-      const token = await getCallbackToken();
+      const restToken = await getRestToken();
       const restUrl = getRestUrl();
 
-      if (token && restUrl && conversationId) {
+      if (restToken && restUrl && conversationId) {
         try {
-          const thread = await fetchViaRestApi(conversationId, token, restUrl);
+          const thread = await fetchViaRestApi(conversationId, restToken, restUrl);
           if (thread) return { thread, isOfficeUnavailable: false };
         } catch (err) {
-          console.warn("[useOutlookThread] REST failed, trying EWS:", err);
+          console.warn("[outlook] REST failed:", err);
         }
       }
 
-      /* 2. EWS FindItem */
+      /* 2. Server-side EWS */
+      if (subject && conversationId) {
+        const ewsToken = await getEwsToken();
+        const ewsUrl = getEwsUrl();
+
+        if (ewsToken && ewsUrl) {
+          try {
+            const thread = await fetchViaServerEws(
+              ewsToken,
+              ewsUrl,
+              subject,
+              conversationId,
+            );
+            if (thread) return { thread, isOfficeUnavailable: false };
+          } catch (err) {
+            console.warn("[outlook] Server EWS failed:", err);
+          }
+        }
+      }
+
+      /* 3. Client-side EWS */
       if (conversationId && subject) {
-        const ewsThread = await findConversationViaEws(conversationId, subject);
+        const ewsThread = await findConversationViaClientEws(
+          conversationId,
+          subject,
+        );
         if (ewsThread) {
           return { thread: ewsThread, isOfficeUnavailable: false };
         }
       }
 
-      /* 3. Read current item */
+      /* 4. Read current item */
       const singleItem = await readCurrentItem();
       if (singleItem) {
         return { thread: singleItem, isOfficeUnavailable: false };
