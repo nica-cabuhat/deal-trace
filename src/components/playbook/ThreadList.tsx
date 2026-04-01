@@ -277,7 +277,14 @@ interface ThreadCardProps {
 }
 
 function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHealth }) {
-  const latest = thread.messages[0];
+  const prospectName = thread.mainContact ?? thread.messages.find(
+    (m) => !m.from.emailAddress.address.includes("sophos.com"),
+  )?.from.emailAddress.name;
+
+  const prospectEmail = thread.messages.find(
+    (m) => !m.from.emailAddress.address.includes("sophos.com"),
+  )?.from.emailAddress.address;
+
   return (
     <>
       <div className="mb-1 flex items-start justify-between gap-2">
@@ -288,35 +295,36 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
           {thread.subject}
         </h3>
       </div>
-      <div className="mb-1.5 flex items-center justify-between gap-2">
-        {latest && (
-          <p
-            className="min-w-0 flex-1 truncate text-xs"
-            style={{ color: "var(--color-gray-500)" }}
-          >
-            {latest.from.emailAddress.name}
-            <span className="ml-1 opacity-70">
-              &lt;{latest.from.emailAddress.address}&gt;
-            </span>
-            <span className="ml-1 opacity-50">
-              · {thread.messages.length} message
-              {thread.messages.length !== 1 ? "s" : ""}
-            </span>
-          </p>
-        )}
-        {health && <ScoreBadge health={health} />}
-      </div>
-      {thread.product && (
-        <span
-          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{
-            background: "var(--color-blue-35)",
-            color: "var(--color-sophos-blue)",
-          }}
+      {prospectName && (
+        <p
+          className="mb-0.5 truncate text-xs"
+          style={{ color: "var(--color-gray-500)" }}
         >
-          {thread.product}
-        </span>
+          {prospectName}
+          {prospectEmail && (
+            <span className="ml-1 opacity-70">
+              &lt;{prospectEmail}&gt;
+            </span>
+          )}
+        </p>
       )}
+      <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-400)" }}>
+        {thread.messages.length} message{thread.messages.length !== 1 ? "s" : ""}
+      </p>
+      <div className="flex items-center gap-2">
+        {health && <ScoreBadge health={health} />}
+        {thread.product && (
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{
+              background: "var(--color-blue-35)",
+              color: "var(--color-sophos-blue)",
+            }}
+          >
+            {thread.product}
+          </span>
+        )}
+      </div>
     </>
   );
 }
@@ -330,7 +338,7 @@ function ThreadCard({
   onSelect,
 }: ThreadCardProps) {
   const [open, setOpen] = useState(false);
-  const latest = thread.messages[0];
+  const previewText = thread.messages[0]?.bodyPreview;
   const gradientId = `rainbow-${thread.conversationId}`;
 
   const cardBorder = isSelected
@@ -355,12 +363,12 @@ function ThreadCard({
           aria-current={isSelected ? "true" : undefined}
         >
           <CardHeader thread={thread} health={health} />
-          {latest?.bodyPreview && (
+          {previewText && (
             <p
               className="mt-1.5 line-clamp-2 text-xs"
               style={{ color: "var(--color-gray-600)" }}
             >
-              {latest.bodyPreview}
+              {previewText}
             </p>
           )}
         </button>
@@ -405,12 +413,12 @@ function ThreadCard({
           </svg>
         </Trigger>
 
-        {!open && latest?.bodyPreview && (
+        {!open && previewText && (
           <p
             className="line-clamp-2 px-3 pb-2 text-xs"
             style={{ color: "var(--color-gray-600)" }}
           >
-            {latest.bodyPreview}
+            {previewText}
           </p>
         )}
 
