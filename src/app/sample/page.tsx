@@ -251,7 +251,6 @@ export default function SamplePage() {
   const [isLiveScoring, setIsLiveScoring] = useState(false);
   const [liveDraftingId, setLiveDraftingId] = useState<string | null>(null);
   const [liveProjectedScore, setLiveProjectedScore] = useState<number | undefined>();
-  const [isLiveProjecting, setIsLiveProjecting] = useState(false);
   const [isAllThreadsOpen, setIsAllThreadsOpen] = useState(false);
   const lastLiveConvId = useRef<string | null>(null);
 
@@ -420,41 +419,16 @@ export default function SamplePage() {
   const handleLiveDraft = useCallback(
     async (thread: EmailThread) => {
       setLiveDraftingId(thread.conversationId);
-      let health: ThreadHealth;
       try {
-        health = await scoreThread({ thread, includeDraft: true });
+        const health = await scoreThread({ thread, includeDraft: true });
         setLiveHealth(health);
+
+        if (health.draftEmail) {
+          const boost = health.healthScore >= 80 ? 5 : health.healthScore >= 50 ? 10 : 15;
+          setLiveProjectedScore(Math.min(98, health.healthScore + boost));
+        }
       } finally {
         setLiveDraftingId(null);
-      }
-
-      if (!health.draftEmail) return;
-
-      setIsLiveProjecting(true);
-      try {
-        const withDraft: EmailThread = {
-          ...thread,
-          messages: [
-            ...thread.messages,
-            {
-              id: `draft-${Date.now()}`,
-              conversationId: thread.conversationId,
-              subject: `Re: ${thread.subject}`,
-              bodyPreview: health.draftEmail,
-              receivedDateTime: new Date().toISOString(),
-              from: {
-                emailAddress: {
-                  name: "You (projected follow-up)",
-                  address: "seller@company.com",
-                },
-              },
-            },
-          ],
-        };
-        const projected = await scoreThread({ thread: withDraft });
-        setLiveProjectedScore(projected.healthScore);
-      } finally {
-        setIsLiveProjecting(false);
       }
     },
     [scoreThread],
@@ -510,7 +484,7 @@ export default function SamplePage() {
               onRequestDraft={() => void handleLiveDraft(t)}
               isDraftLoading={liveDraftingId === t.conversationId}
               projectedScore={liveProjectedScore}
-              isProjecting={isLiveProjecting}
+              isProjecting={false}
             />
 
             <section aria-label="All deal threads">
