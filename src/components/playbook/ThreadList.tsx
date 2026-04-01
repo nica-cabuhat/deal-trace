@@ -311,12 +311,13 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
       <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-400)" }}>
         {thread.messages.length} message{thread.messages.length !== 1 ? "s" : ""}
       </p>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         {health && <ScoreBadge health={health} />}
         {thread.product && (
           <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+            className="inline-flex items-center rounded-full px-2 py-0.5 font-medium"
             style={{
+              fontSize: "8px",
               background: "var(--color-blue-35)",
               color: "var(--color-sophos-blue)",
             }}
@@ -365,8 +366,15 @@ function ThreadCard({
           <CardHeader thread={thread} health={health} />
           {previewText && (
             <p
-              className="mt-1.5 line-clamp-2 text-xs"
-              style={{ color: "var(--color-gray-600)" }}
+              className="mt-1.5 text-xs"
+              style={{
+                color: "var(--color-gray-600)",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
             >
               {previewText}
             </p>
@@ -415,8 +423,15 @@ function ThreadCard({
 
         {!open && previewText && (
           <p
-            className="line-clamp-2 px-3 pb-2 text-xs"
-            style={{ color: "var(--color-gray-600)" }}
+            className="px-3 pb-2 text-xs"
+            style={{
+              color: "var(--color-gray-600)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
           >
             {previewText}
           </p>
