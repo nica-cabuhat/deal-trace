@@ -90,10 +90,16 @@ function AppHeader() {
       </div>
       <button
         type="button"
-        onClick={() => window.location.reload()}
+        onClick={() => {
+          try {
+            Office?.context?.ui?.closeContainer?.();
+          } catch {
+            window.location.href = window.location.pathname;
+          }
+        }}
         className="rounded p-1.5 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
-        aria-label="Refresh for current email"
-        title="Sync with selected email"
+        aria-label="Close and reopen for current email"
+        title="Close — reopen from ribbon to sync"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M21 2v6h-6" />
