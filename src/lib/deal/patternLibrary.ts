@@ -16,10 +16,10 @@ interface DealPattern {
 const SELLER_DOMAIN = "sophos.com";
 
 const WON_INDICATORS =
-  /\b(execute the contract|order form|sign|PO\b|purchase order|approved|proceed|budget approved|begin immediately|send the order|ready to sign|PO is incoming|PO coming|countersigned)\b/i;
+  /\b(execute the contract|order form|send the order|PO\b|purchase order|approved|begin immediately|ready to sign|PO is incoming|PO coming|countersigned|send the contract|go-ahead|move forward|want to proceed|prepared to move|let's get this done|sending to procurement)\b/i;
 
 const LOST_INDICATORS =
-  /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different)\b/i;
+  /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different|cannot proceed|we've made our decision)\b/i;
 
 const PRODUCT_RE =
   /\bSophos\s+(Intercept\s*X|MDR|XDR|Firewall|Central|Endpoint|Email|ZTNA|Cloud\s*(?:Optix|Security))\b/i;
@@ -34,8 +34,8 @@ function classifyOutcome(thread: EmailThread): Outcome {
   const last3 = thread.messages.slice(-3);
   const text = last3.map((m) => m.bodyPreview).join(" ");
 
-  if (WON_INDICATORS.test(text)) return "won";
   if (LOST_INDICATORS.test(text)) return "lost";
+  if (WON_INDICATORS.test(text)) return "won";
 
   const lastMsg = thread.messages[thread.messages.length - 1];
   if (lastMsg?.from.emailAddress.address.includes(SELLER_DOMAIN)) {

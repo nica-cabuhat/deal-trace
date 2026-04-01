@@ -2,9 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Content, Root, Trigger } from "@radix-ui/react-collapsible";
-import rawMessages from "@/lib/data/threads.json";
+import caseStudiesData from "@/lib/data/case-studies.json";
 import type { EmailMessage, EmailThread } from "@/lib/types/thread";
-import { groupIntoThreads } from "@/lib/graph/groupThreads";
 import { useMailboxConversation } from "@/lib/outlook/useMailboxConversation";
 import { useAnalyze } from "@/lib/queries/useAnalyze";
 import { useScore, type ThreadHealth } from "@/lib/queries/useScore";
@@ -14,7 +13,31 @@ import ThreadScore from "@/components/playbook/ThreadScore";
 import TagBadge from "@/components/playbook/TagBadge";
 import { getPatternStats } from "@/lib/deal/patternLibrary";
 
-const baseThreads = groupIntoThreads(rawMessages as unknown as EmailMessage[]);
+interface CaseStudyEntry {
+  conversationId: string;
+  subject: string;
+  product?: string;
+  mainContact?: string;
+  threadTags: EmailThread["threadTags"];
+  messages: EmailMessage[];
+  health: ThreadHealth;
+}
+
+const caseStudies = caseStudiesData as unknown as CaseStudyEntry[];
+
+const cachedThreads: EmailThread[] = caseStudies.map((cs) => ({
+  conversationId: cs.conversationId,
+  subject: cs.subject,
+  product: cs.product,
+  mainContact: cs.mainContact,
+  threadTags: cs.threadTags,
+  messages: cs.messages,
+}));
+
+const cachedHealthMap: Record<string, ThreadHealth> = Object.fromEntries(
+  caseStudies.map((cs) => [cs.conversationId, cs.health]),
+);
+
 const patternStats = getPatternStats();
 
 /** Strip Exchange legacy DN paths from sender display names. */
@@ -239,13 +262,6 @@ export default function SamplePage() {
   >(null);
   const [urlMailboxSubject, setUrlMailboxSubject] = useState<string | null>(null);
 
-  // ── State A: static threads for playbook list ──────────────────────────────
-  const [threads, setThreads] = useState<EmailThread[]>(baseThreads);
-  const [healthMap, setHealthMap] = useState<Record<string, ThreadHealth>>({});
-  const analyzedIds = useRef<Set<string>>(new Set());
-  const scoredIds = useRef<Set<string>>(new Set());
-  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
-
   // ── State B: live thread from real Outlook conversation ────────────────────
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
   const [liveHealth, setLiveHealth] = useState<ThreadHealth | null>(null);
@@ -367,57 +383,6 @@ export default function SamplePage() {
     void run();
   }, [fetchedThread, isLoadingConversation, analyze, scoreThread]);
 
-  // ── State A: expand / analyze static threads (retrospective) ────────────────
-  const doScore = useCallback(
-    async (thread: EmailThread) => {
-      const health = await scoreThread({ thread, retrospective: true });
-      setHealthMap((prev) => ({ ...prev, [thread.conversationId]: health }));
-    },
-    [scoreThread],
-  );
-
-  const ensureThreadAnalyzed = useCallback(
-    async (thread: EmailThread) => {
-      const cid = thread.conversationId;
-      if (analyzedIds.current.has(cid) && scoredIds.current.has(cid)) return;
-
-      if (!analyzedIds.current.has(cid)) {
-        analyzedIds.current.add(cid);
-        setAnalyzingId(cid);
-        try {
-          const result = await analyze(thread.messages);
-          const analyzedThread: EmailThread = {
-            ...thread,
-            messages: result.messages,
-            threadTags: result.threadTags,
-            product: result.product ?? thread.product,
-            mainContact: result.mainContact ?? thread.mainContact,
-          };
-          setThreads((prev) =>
-            prev.map((t) => (t.conversationId === cid ? analyzedThread : t)),
-          );
-          scoredIds.current.add(cid);
-          await doScore(analyzedThread);
-        } catch {
-          analyzedIds.current.delete(cid);
-        } finally {
-          setAnalyzingId(null);
-        }
-      } else if (!scoredIds.current.has(cid)) {
-        scoredIds.current.add(cid);
-        await doScore(thread);
-      }
-    },
-    [analyze, doScore],
-  );
-
-  const handleExpand = useCallback(
-    (thread: EmailThread) => {
-      void ensureThreadAnalyzed(thread);
-    },
-    [ensureThreadAnalyzed],
-  );
-
   const handleLiveDraft = useCallback(
     async (thread: EmailThread) => {
       setLiveDraftingId(thread.conversationId);
@@ -515,8 +480,8 @@ export default function SamplePage() {
                     Download Rep Playbook
                   </button>
                   <ThreadList
-                    threads={threads}
-                    healthMap={healthMap}
+                    threads={cachedThreads}
+                    healthMap={cachedHealthMap}
                   />
                 </div>
               )}
@@ -631,10 +596,8 @@ export default function SamplePage() {
           Download Rep Playbook
         </button>
         <ThreadList
-          threads={threads}
-          healthMap={healthMap}
-          loadingId={analyzingId}
-          onExpand={handleExpand}
+          threads={cachedThreads}
+          healthMap={cachedHealthMap}
         />
       </div>
     </div>

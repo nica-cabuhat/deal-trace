@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:case-studies": "tsx scripts/generate-case-studies-deterministic.ts"
   },
   "dependencies": {
     "@azure/msal-browser": "5.5.0",
