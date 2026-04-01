@@ -420,13 +420,14 @@ export default function SamplePage() {
     async (thread: EmailThread) => {
       setLiveDraftingId(thread.conversationId);
       try {
-        const health = await scoreThread({ thread, includeDraft: true });
-        setLiveHealth(health);
+        const result = await scoreThread({ thread, includeDraft: true });
 
-        if (health.draftEmail) {
-          const boost = health.healthScore >= 80 ? 5 : health.healthScore >= 50 ? 10 : 15;
-          setLiveProjectedScore(Math.min(98, health.healthScore + boost));
-        }
+        setLiveHealth((prev) => {
+          const base = prev ?? result;
+          const boost = base.healthScore >= 80 ? 5 : base.healthScore >= 50 ? 10 : 15;
+          setLiveProjectedScore(Math.min(98, base.healthScore + boost));
+          return { ...base, draftEmail: result.draftEmail };
+        });
       } finally {
         setLiveDraftingId(null);
       }
