@@ -420,16 +420,38 @@ export default function SamplePage() {
   const handleLiveDraft = useCallback(
     async (thread: EmailThread) => {
       setLiveDraftingId(thread.conversationId);
+      let health: ThreadHealth;
       try {
-        const health = await scoreThread({ thread, includeDraft: true });
+        health = await scoreThread({ thread, includeDraft: true });
         setLiveHealth(health);
       } finally {
         setLiveDraftingId(null);
       }
 
+      if (!health.draftEmail) return;
+
       setIsLiveProjecting(true);
       try {
-        const projected = await scoreThread({ thread });
+        const withDraft: EmailThread = {
+          ...thread,
+          messages: [
+            ...thread.messages,
+            {
+              id: `draft-${Date.now()}`,
+              conversationId: thread.conversationId,
+              subject: `Re: ${thread.subject}`,
+              bodyPreview: health.draftEmail,
+              receivedDateTime: new Date().toISOString(),
+              from: {
+                emailAddress: {
+                  name: "You (projected follow-up)",
+                  address: "seller@company.com",
+                },
+              },
+            },
+          ],
+        };
+        const projected = await scoreThread({ thread: withDraft });
         setLiveProjectedScore(projected.healthScore);
       } finally {
         setIsLiveProjecting(false);
