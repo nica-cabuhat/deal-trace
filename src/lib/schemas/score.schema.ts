@@ -4,12 +4,14 @@ import { EmailThreadSchema } from "./thread.schema";
 export const ScoreRequestSchema = z.object({
   thread: EmailThreadSchema,
   includeDraft: z.boolean().optional(),
+  retrospective: z.boolean().optional(),
 });
 
 // Raw Groq response — null-safe
 export const GroqScoreResponseSchema = z.object({
   healthScore: z.number().min(0).max(100),
   prediction: z.enum(["on_track", "at_risk", "critical"]),
+  outcome: z.enum(["won", "lost", "active"]).nullish().transform((v) => v ?? undefined),
   winFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
   recommendations: z.array(z.string()),
@@ -19,6 +21,7 @@ export const GroqScoreResponseSchema = z.object({
 export const ThreadHealthSchema = z.object({
   healthScore: z.number().min(0).max(100),
   prediction: z.enum(["on_track", "at_risk", "critical"]),
+  outcome: z.enum(["won", "lost", "active"]).optional(),
   winFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
   recommendations: z.array(z.string()),

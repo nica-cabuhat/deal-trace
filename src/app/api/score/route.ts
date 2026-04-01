@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { getGroqClient } from "@/lib/groq/client";
 import { ScoreRequestSchema, GroqScoreResponseSchema, ScoreResponseSchema } from "@/lib/schemas/score.schema";
 import { env } from "@/lib/schemas/env.schema";
+import { getPatternContext } from "@/lib/deal/patternLibrary";
 import type { EmailThread } from "@/lib/types/thread";
 
-const SYSTEM_PROMPT = `You are a won/loss divergence engine for B2B sales deals. Given a tagged email thread with behavioral signals, compute a deal health score.
+const ACTIVE_PROMPT = `You are a won/loss divergence engine for B2B sales deals. Given a tagged email thread with behavioral signals, compute a deal health score.
 
 You MUST read ALL messages and their tags carefully, paying special attention to the FINAL messages — they carry the most weight.
 
@@ -33,13 +34,13 @@ SCORING RULES (apply in order):
 - "critical": healthScore < 35
 
 --- Win Factors ---
-List 2–4 specific things from this thread working in favor of closing. Reference actual prospect actions and signals. If the deal is lost, win factors should reflect what WENT WELL before the loss (past tense).
+List 2–4 specific things from this thread working in favor of closing. Reference actual prospect actions and signals.
 
 --- Risk Factors ---
-List 2–4 specific risks. If the deal is lost, list the reasons for the loss. Reference actual prospect statements.
+List 2–4 specific risks threatening the deal. Reference actual prospect statements.
 
 --- Recommendations ---
-List 3–5 actionable next steps. If the deal is lost, recommend post-mortem actions (document lessons, review pricing strategy, etc.). Be specific to this deal.
+List 3–5 actionable next steps the sales rep should take RIGHT NOW. Be specific to this deal.
 
 --- Draft Email (if requested) ---
 Write a short (3–5 sentence) professional email from the seller to the main contact.
@@ -55,6 +56,47 @@ Write a short (3–5 sentence) professional email from the seller to the main co
   "riskFactors": ["IT director has unresolved technical questions", "no procurement timeline confirmed"],
   "recommendations": ["Send a TCO comparison document", "Schedule a technical deep-dive with IT director"],
   "draftEmail": "Hi [Name], ..."
+}`;
+
+const RETROSPECTIVE_PROMPT = `You are a deal post-mortem analyst for B2B sales. This email thread represents a CONCLUDED deal — it is already over. Your job is to analyze it retrospectively as a case study.
+
+Read ALL messages carefully and determine the outcome: did the deal close successfully (won) or did the prospect decline/go silent/choose a competitor (lost)?
+
+--- Outcome ---
+Classify as "won" or "lost" based on the final messages.
+
+--- Health Score ---
+Compute a retrospective score 0–100 reflecting how well the deal was executed overall.
+- Won deals with smooth execution: 85–98
+- Won deals with significant friction: 65–84
+- Lost deals where the rep performed well but lost on external factors: 30–50
+- Lost deals due to rep mistakes or poor execution: 5–29
+
+--- Prediction ---
+- "on_track" if won
+- "at_risk" if lost due to external factors
+- "critical" if lost due to execution failures
+
+--- Win Factors (what helped) ---
+List 2–4 things the sales rep did WELL in this deal (past tense). These are lessons to REPEAT in future deals.
+Examples: "Built multi-threaded relationship by engaging both CISO and IT director", "Responded to pricing objection within 2 hours with TCO comparison"
+
+--- Risk Factors (what hurt) ---
+List 2–4 things that went WRONG or could have been done better (past tense). These are lessons to AVOID.
+Examples: "Failed to address competitor comparison early enough", "Lost momentum with 5-day gap between follow-ups"
+
+--- Recommendations (lessons learned) ---
+List 3–5 takeaways for future deals. Frame as reusable advice, NOT next steps for this deal (it's over).
+Examples: "When a prospect mentions a competitor, address it in the same email — don't wait", "Always confirm procurement timeline before sending a proposal"
+
+--- Response Format ---
+{
+  "healthScore": 85,
+  "prediction": "on_track",
+  "outcome": "won",
+  "winFactors": ["Quickly addressed technical concerns from IT director", "Provided compelling TCO comparison"],
+  "riskFactors": ["Slow follow-up after initial meeting created a 5-day gap", "Did not proactively address competitor pricing"],
+  "recommendations": ["Always confirm budget authority before deep-dive meetings", "Send follow-up materials within 24 hours of every call"]
 }`;
 
 function buildThreadSummary(thread: EmailThread, includeDraft: boolean): string {
@@ -96,11 +138,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const { thread, includeDraft = false } = parsed.data;
+  const { thread, includeDraft = false, retrospective = false } = parsed.data;
 
   const summary = buildThreadSummary(thread, includeDraft);
+  const patternContext = retrospective ? "" : getPatternContext();
+  const prompt = retrospective
+    ? RETROSPECTIVE_PROMPT
+    : `${patternContext}\n\n${ACTIVE_PROMPT}`;
+  const userMsg = retrospective
+    ? `Analyze this concluded deal thread as a case study and respond in json:\n${summary}`
+    : `Score this deal thread and respond in json:\n${summary}`;
+
   console.log(
-    `[score] Thread: "${thread.subject}" | product: "${thread.product}" | tags: ${thread.threadTags?.length ?? 0} | messages: ${thread.messages.length}`,
+    `[score] Thread: "${thread.subject}" | product: "${thread.product}" | retrospective: ${retrospective} | messages: ${thread.messages.length}`,
   );
 
   const groq = getGroqClient();
@@ -111,8 +161,8 @@ export async function POST(req: Request) {
       response_format: { type: "json_object" },
       temperature: 0,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Score this deal thread and respond in json:\n${summary}` },
+        { role: "system", content: prompt },
+        { role: "user", content: userMsg },
       ],
     });
   } catch (error) {

@@ -159,17 +159,29 @@ function DealAnalysisSummary({
   health: ThreadHealth;
   gradientId: string;
 }) {
+  const isWon = health.outcome === "won";
+  const outcomeLabel = isWon ? "Won" : health.outcome === "lost" ? "Lost" : "Concluded";
+  const outcomeColor = isWon ? "var(--color-green-400)" : "var(--color-orange-500)";
+
   return (
     <div
       className="mt-2 border-t pt-3"
       style={{ borderColor: "var(--color-gray-200)" }}
     >
-      <p
-        className="mb-3 text-sm font-semibold"
-        style={{ color: "var(--color-gray-900)" }}
-      >
-        Deal Analysis Summary
-      </p>
+      <div className="mb-3 flex items-center justify-between">
+        <p
+          className="text-sm font-semibold"
+          style={{ color: "var(--color-gray-900)" }}
+        >
+          Case Study
+        </p>
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-semibold"
+          style={{ background: isWon ? "var(--color-green-50)" : "var(--color-orange-50)", color: outcomeColor }}
+        >
+          {outcomeLabel}
+        </span>
+      </div>
 
       <RainbowGauge
         score={health.healthScore}
@@ -183,7 +195,7 @@ function DealAnalysisSummary({
             className="mb-1.5 text-xs font-semibold"
             style={{ color: "var(--color-green-400)" }}
           >
-            Win Factors
+            What Helped
           </p>
           <ul className="space-y-1">
             {health.winFactors.map((f, i) => (
@@ -205,7 +217,7 @@ function DealAnalysisSummary({
             className="mb-1.5 text-xs font-semibold"
             style={{ color: "var(--color-orange-500)" }}
           >
-            Lose Factor
+            What Hurt
           </p>
           <ul className="space-y-1">
             {health.riskFactors.map((f, i) => (
@@ -229,7 +241,7 @@ function DealAnalysisSummary({
           className="mb-1.5 text-xs font-semibold"
           style={{ color: "var(--color-gray-700)" }}
         >
-          Recommendations
+          Lessons Learned
         </p>
         <ol className="space-y-1">
           {health.recommendations.map((r, i) => (

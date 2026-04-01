@@ -12,8 +12,10 @@ import { useConversationThread } from "@/lib/queries/useConversationThread";
 import ThreadList from "@/components/playbook/ThreadList";
 import ThreadScore from "@/components/playbook/ThreadScore";
 import TagBadge from "@/components/playbook/TagBadge";
+import { getPatternStats } from "@/lib/deal/patternLibrary";
 
 const baseThreads = groupIntoThreads(rawMessages as unknown as EmailMessage[]);
+const patternStats = getPatternStats();
 
 /** Strip Exchange legacy DN paths from sender display names. */
 function cleanName(raw: string): string {
@@ -365,10 +367,10 @@ export default function SamplePage() {
     void run();
   }, [fetchedThread, isLoadingConversation, analyze, scoreThread]);
 
-  // ── State A: expand / analyze static threads ───────────────────────────────
+  // ── State A: expand / analyze static threads (retrospective) ────────────────
   const doScore = useCallback(
     async (thread: EmailThread) => {
-      const health = await scoreThread({ thread });
+      const health = await scoreThread({ thread, retrospective: true });
       setHealthMap((prev) => ({ ...prev, [thread.conversationId]: health }));
     },
     [scoreThread],
@@ -610,12 +612,17 @@ export default function SamplePage() {
       <AppHeader />
       {showSampleDevHint && <DevMailboxHint />}
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
-        <h2
-          className="text-base font-semibold"
-          style={{ color: "var(--color-gray-900)" }}
-        >
-          All Deal Threads
-        </h2>
+        <div>
+          <h2
+            className="text-base font-semibold"
+            style={{ color: "var(--color-gray-900)" }}
+          >
+            All Deal Threads
+          </h2>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--color-gray-450)" }}>
+            Based on {patternStats.won} won and {patternStats.lost} lost deals
+          </p>
+        </div>
         <button
           type="button"
           className="w-full rounded-md py-2.5 text-sm font-medium text-white"

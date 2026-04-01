@@ -8,15 +8,16 @@ export type ThreadHealth = z.infer<typeof ScoreResponseSchema>;
 interface ScoreRequest {
   thread: EmailThread;
   includeDraft?: boolean;
+  retrospective?: boolean;
 }
 
 export function useScore() {
   return useMutation<ThreadHealth, Error, ScoreRequest>({
-    mutationFn: async ({ thread, includeDraft = false }) => {
+    mutationFn: async ({ thread, includeDraft = false, retrospective = false }) => {
       const res = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thread, includeDraft }),
+        body: JSON.stringify({ thread, includeDraft, retrospective }),
       });
 
       if (!res.ok) {
