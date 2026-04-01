@@ -311,13 +311,12 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
       <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-400)" }}>
         {thread.messages.length} message{thread.messages.length !== 1 ? "s" : ""}
       </p>
-      <div className="flex items-center gap-4">
-        {health && <ScoreBadge health={health} />}
+      <div className="flex items-center justify-between">
         {thread.product && (
           <span
             className="inline-flex items-center rounded-full px-2 py-0.5 font-medium"
             style={{
-              fontSize: "8px",
+              fontSize: "10px",
               background: "var(--color-blue-35)",
               color: "var(--color-sophos-blue)",
             }}
@@ -325,6 +324,7 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
             {thread.product}
           </span>
         )}
+        {health && <ScoreBadge health={health} />}
       </div>
     </>
   );
