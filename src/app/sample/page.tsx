@@ -223,7 +223,6 @@ export default function SamplePage() {
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
   // ── State B: live thread from real Outlook conversation ────────────────────
-  const [selectedIsDeal, setSelectedIsDeal] = useState<boolean | null>(null);
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
   const [liveHealth, setLiveHealth] = useState<ThreadHealth | null>(null);
   const [isLiveAnalyzing, setIsLiveAnalyzing] = useState(false);
@@ -249,7 +248,6 @@ export default function SamplePage() {
     onConversationChanged: () => {
       setLiveThread(null);
       setLiveHealth(null);
-      setSelectedIsDeal(null);
       lastLiveConvId.current = null;
     },
   });
@@ -274,6 +272,9 @@ export default function SamplePage() {
   const fetchedThread = conversationResult?.thread ?? null;
   const isUnauthorized = conversationResult?.isUnauthorized ?? false;
 
+  // Derived synchronously — no effect needed for deal detection
+  const selectedIsDeal = fetchedThread ? isDealEmail(fetchedThread) : null;
+
   const handleSignIn = useCallback(() => {
     const popup = window.open(
       "/api/auth/signin/azure-ad?callbackUrl=/auth-complete",
@@ -295,9 +296,14 @@ export default function SamplePage() {
       if (!isLoadingConversation && lastLiveConvId.current) {
         setLiveThread(null);
         setLiveHealth(null);
-        setSelectedIsDeal(null);
         lastLiveConvId.current = null;
       }
+      return;
+    }
+
+    if (!isDealEmail(fetchedThread)) {
+      setLiveThread(null);
+      lastLiveConvId.current = null;
       return;
     }
 
@@ -305,15 +311,6 @@ export default function SamplePage() {
     lastLiveConvId.current = fetchedThread.conversationId;
     setLiveHealth(null);
     setLiveProjectedScore(undefined);
-
-    const deal = isDealEmail(fetchedThread);
-    setSelectedIsDeal(deal);
-
-    if (!deal) {
-      setLiveThread(null);
-      setIsLiveAnalyzing(false);
-      return;
-    }
 
     const run = async () => {
       setIsLiveAnalyzing(true);
@@ -504,10 +501,29 @@ export default function SamplePage() {
         </div>
       );
     }
+
+    // Deal detected but analysis hasn't started yet — show spinner
+    return (
+      <div
+        className="flex min-h-screen flex-col"
+        style={{ background: "var(--color-gray-50)" }}
+      >
+        <AppHeader />
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+            style={{ borderColor: "var(--color-sophos-blue)", borderTopColor: "transparent" }}
+          />
+          <p className="text-sm" style={{ color: "var(--color-gray-500)" }}>
+            Analyzing deal signals…
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // ── Loading / auth states ─────────────────────────────────────────────────
-  if (hasMailboxContext && isLoadingConversation && selectedIsDeal === null) {
+  if (hasMailboxContext && isLoadingConversation) {
     return (
       <div
         className="flex min-h-screen flex-col"
