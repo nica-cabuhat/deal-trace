@@ -22,7 +22,7 @@ if [ ! -f "$MANIFEST" ]; then
 fi
 
 # 1. Generate manifest-dev.xml with tunnel URL
-sed -E "s|https://[^\"'/]+|$TUNNEL_URL|g" "$MANIFEST" > "$OUTPUT"
+sed -E "s|https://deal-trace-gse\.vercel\.app|$TUNNEL_URL|g" "$MANIFEST" > "$OUTPUT"
 echo "✅ manifest-dev.xml generated"
 
 # 2. Update next.config.ts with new allowedDevOrigins
