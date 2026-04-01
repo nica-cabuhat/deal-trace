@@ -248,6 +248,9 @@ export default function SamplePage() {
     onConversationChanged: () => {
       setLiveThread(null);
       setLiveHealth(null);
+      setLiveProjectedScore(undefined);
+      setIsLiveAnalyzing(false);
+      setIsLiveScoring(false);
       lastLiveConvId.current = null;
     },
   });

@@ -7,28 +7,19 @@ import {
 } from "@/lib/outlook/readConversationId";
 
 export interface UseMailboxConversationOptions {
-  /** Fires when the selected mail item changes (e.g. clear manual list selection). */
   onConversationChanged?: () => void;
 }
 
 const OFFICE_POLL_MS = 50;
-const OFFICE_WAIT_MS = 15000;
+const OFFICE_WAIT_MS = 15_000;
+const ITEM_POLL_MS = 1_500;
 
-/**
- * Outlook / embedded WebViews can fire Office callbacks before React has finished
- * mounting; defer state updates to the next task.
- */
 function scheduleAfterMount(mounted: () => boolean, fn: () => void): void {
   window.setTimeout(() => {
     if (mounted()) fn();
   }, 0);
 }
 
-/**
- * Tracks the conversation ID (and subject) of the mail item open in Outlook.
- * Waits for the hosted `office.js` script (see `taskpane/layout.tsx`) and polls until
- * `Office` exists so slow loads are not missed.
- */
 export function useMailboxConversation(
   options?: UseMailboxConversationOptions,
 ): {
@@ -37,8 +28,8 @@ export function useMailboxConversation(
   isOfficeReady: boolean;
 } {
   const onConversationChangedRef = useRef(options?.onConversationChanged);
-
   const mountedRef = useRef(false);
+  const lastIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     onConversationChangedRef.current = options?.onConversationChanged;
@@ -48,44 +39,67 @@ export function useMailboxConversation(
   const [itemSubject, setItemSubject] = useState<string | null>(null);
   const [isOfficeReady, setIsOfficeReady] = useState(false);
 
-  const refresh = useCallback(() => {
-    onConversationChangedRef.current?.();
+  const readAndUpdate = useCallback(
+    (fireChanged: boolean) => {
+      if (typeof Office === "undefined" || !Office.context?.mailbox?.item) {
+        scheduleAfterMount(
+          () => mountedRef.current,
+          () => {
+            if (lastIdRef.current !== null && fireChanged) {
+              onConversationChangedRef.current?.();
+            }
+            lastIdRef.current = null;
+            setConversationId(null);
+            setItemSubject(null);
+          },
+        );
+        return;
+      }
 
-    if (typeof Office === "undefined" || !Office.context?.mailbox?.item) {
-      scheduleAfterMount(
-        () => mountedRef.current,
-        () => {
-          setConversationId(null);
-          setItemSubject(null);
-        },
-      );
-      return;
-    }
-
-    const item = Office.context.mailbox.item;
-    void Promise.all([
-      readConversationIdFromItem(item),
-      readSubjectFromItem(item),
-    ]).then(([id, sub]) => {
-      scheduleAfterMount(() => mountedRef.current, () => {
-        setConversationId(id);
-        setItemSubject(sub);
+      const item = Office.context.mailbox.item;
+      void Promise.all([
+        readConversationIdFromItem(item),
+        readSubjectFromItem(item),
+      ]).then(([id, sub]) => {
+        scheduleAfterMount(
+          () => mountedRef.current,
+          () => {
+            const key = id ?? sub;
+            if (key !== lastIdRef.current) {
+              if (fireChanged && lastIdRef.current !== null) {
+                onConversationChangedRef.current?.();
+              }
+              lastIdRef.current = key;
+              setConversationId(id);
+              setItemSubject(sub);
+            }
+          },
+        );
       });
-    });
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
     mountedRef.current = true;
     let cancelled = false;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let initIntervalId: ReturnType<typeof setInterval> | undefined;
+    let pollIntervalId: ReturnType<typeof setInterval> | undefined;
 
     const isMounted = () => mountedRef.current && !cancelled;
+
+    const startItemPolling = () => {
+      pollIntervalId = setInterval(() => {
+        if (cancelled) return;
+        readAndUpdate(true);
+      }, ITEM_POLL_MS);
+    };
 
     const attachMailboxHandlers = () => {
       try {
         Office.context.mailbox.addHandlerAsync(
           Office.EventType.ItemChanged,
-          refresh,
+          () => readAndUpdate(true),
           () => {
             /* non-fatal */
           },
@@ -98,8 +112,9 @@ export function useMailboxConversation(
     const afterOfficeReady = () => {
       scheduleAfterMount(isMounted, () => {
         setIsOfficeReady(true);
-        refresh();
+        readAndUpdate(false);
         attachMailboxHandlers();
+        startItemPolling();
       });
     };
 
@@ -111,16 +126,17 @@ export function useMailboxConversation(
       return () => {
         cancelled = true;
         mountedRef.current = false;
+        if (pollIntervalId !== undefined) clearInterval(pollIntervalId);
       };
     }
 
     const started = Date.now();
-    intervalId = setInterval(() => {
+    initIntervalId = setInterval(() => {
       if (cancelled) return;
 
       if (typeof Office !== "undefined") {
-        if (intervalId !== undefined) clearInterval(intervalId);
-        intervalId = undefined;
+        if (initIntervalId !== undefined) clearInterval(initIntervalId);
+        initIntervalId = undefined;
         Office.onReady(() => {
           if (cancelled) return;
           afterOfficeReady();
@@ -129,8 +145,8 @@ export function useMailboxConversation(
       }
 
       if (Date.now() - started > OFFICE_WAIT_MS) {
-        if (intervalId !== undefined) clearInterval(intervalId);
-        intervalId = undefined;
+        if (initIntervalId !== undefined) clearInterval(initIntervalId);
+        initIntervalId = undefined;
         scheduleAfterMount(isMounted, () => setIsOfficeReady(true));
       }
     }, OFFICE_POLL_MS);
@@ -138,9 +154,10 @@ export function useMailboxConversation(
     return () => {
       cancelled = true;
       mountedRef.current = false;
-      if (intervalId !== undefined) clearInterval(intervalId);
+      if (initIntervalId !== undefined) clearInterval(initIntervalId);
+      if (pollIntervalId !== undefined) clearInterval(pollIntervalId);
     };
-  }, [refresh]);
+  }, [readAndUpdate]);
 
   return { conversationId, itemSubject, isOfficeReady };
 }
