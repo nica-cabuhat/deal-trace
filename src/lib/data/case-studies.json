@@ -1,9 +1,9 @@
 [
   {
-    "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+    "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
     "subject": "End of life firewall risk in retail environments",
     "product": "Sophos XDR",
-    "mainContact": "Legolas Greenleaf",
+    "mainContact": "Marcus Chen",
     "threadTags": [
       {
         "pattern": "deal closed successfully",
@@ -29,8 +29,8 @@
     ],
     "messages": [
       {
-        "id": "AQMkADAwATY0MDAALegolas001AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus001AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
@@ -39,7 +39,7 @@
           }
         },
         "receivedDateTime": "2026-03-10T08:00:00Z",
-        "bodyPreview": "Hi Legolas, a lot of retail security teams are running on aging perimeter hardware. Wanted to share how Sophos XDR helped similar orgs modernize without downtime. Would love 20 minutes to walk you through it.",
+        "bodyPreview": "Hi Marcus, a lot of retail security teams are running on aging perimeter hardware. Wanted to share how Sophos XDR helped similar orgs modernize without downtime. Would love 20 minutes to walk you through it.",
         "tags": [
           {
             "signal": "outreach/follow-up",
@@ -50,13 +50,13 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas002AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus002AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
-            "name": "Legolas Greenleaf",
-            "address": "legolas.mirkwoodretail@outlook.com"
+            "name": "Marcus Chen",
+            "address": "m.chen@pinnacleretail.com"
           }
         },
         "receivedDateTime": "2026-03-10T09:45:00Z",
@@ -77,8 +77,8 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas003AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus003AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
@@ -98,17 +98,17 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas004AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus004AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
-            "name": "Legolas Greenleaf",
-            "address": "legolas.mirkwoodretail@outlook.com"
+            "name": "Marcus Chen",
+            "address": "m.chen@pinnacleretail.com"
           }
         },
         "receivedDateTime": "2026-03-10T11:00:00Z",
-        "bodyPreview": "Wednesday 10AM works great. I'll send a calendar invite. I'll also loop in our IT director Gimli — he needs to be part of this decision and will have technical questions.",
+        "bodyPreview": "Wednesday 10AM works great. I'll send a calendar invite. I'll also loop in our IT director Ryan — he needs to be part of this decision and will have technical questions.",
         "tags": [
           {
             "signal": "requested meeting/demo",
@@ -125,17 +125,17 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas005AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus005AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
-            "name": "Gimli Gloinsson",
-            "address": "gimli.it@mirkwoodretail.com"
+            "name": "Ryan Tanaka",
+            "address": "r.tanaka@pinnacleretail.com"
           }
         },
         "receivedDateTime": "2026-03-11T08:15:00Z",
-        "bodyPreview": "Nicaela, Legolas forwarded this thread. I've reviewed the Sophos XDR datasheet. I have technical questions about SIEM integration and log retention. Looking forward to the call Wednesday.",
+        "bodyPreview": "Nicaela, Marcus forwarded this thread. I've reviewed the Sophos XDR datasheet. I have technical questions about SIEM integration and log retention. Looking forward to the call Wednesday.",
         "tags": [
           {
             "signal": "looped in additional stakeholder",
@@ -146,8 +146,8 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas006AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus006AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
@@ -156,7 +156,7 @@
           }
         },
         "receivedDateTime": "2026-03-13T11:30:00Z",
-        "bodyPreview": "Great call today with you and Gimli. Attaching the proposal for 200-seat XDR deployment with managed detection. 3-year TCO comes in 40% below your current Fortinet stack. Let me know if you have questions.",
+        "bodyPreview": "Great call today with you and Ryan. Attaching the proposal for 200-seat XDR deployment with managed detection. 3-year TCO comes in 40% below your current Fortinet stack. Let me know if you have questions.",
         "tags": [
           {
             "signal": "outreach/follow-up",
@@ -167,17 +167,17 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas007AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus007AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
-            "name": "Legolas Greenleaf",
-            "address": "legolas.mirkwoodretail@outlook.com"
+            "name": "Marcus Chen",
+            "address": "m.chen@pinnacleretail.com"
           }
         },
         "receivedDateTime": "2026-03-14T09:00:00Z",
-        "bodyPreview": "CISO approved the proposal. Gimli is running the final procurement checklist. We want to move before end of Q1. Can you expedite the order form? We're ready to sign.",
+        "bodyPreview": "CISO approved the proposal. Ryan is running the final procurement checklist. We want to move before end of Q1. Can you expedite the order form? We're ready to sign.",
         "tags": [
           {
             "signal": "executive approved",
@@ -194,8 +194,8 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAALegolas008AAAA==",
-        "conversationId": "AQQkADAwATY0MDAALegolasThread001==",
+        "id": "AQMkADAwATY0MDAAMarcus008AAAA==",
+        "conversationId": "AQQkADAwATY0MDAAmarcusThread001==",
         "subject": "Re: End of life firewall risk in retail environments",
         "from": {
           "emailAddress": {
@@ -204,7 +204,7 @@
           }
         },
         "receivedDateTime": "2026-03-14T10:00:00Z",
-        "bodyPreview": "Order form attached. Countersigned copy sent to procurement. Onboarding team will reach out within 24 hours. Welcome to Sophos, Legolas and Gimli!",
+        "bodyPreview": "Order form attached. Countersigned copy sent to procurement. Onboarding team will reach out within 24 hours. Welcome to Sophos, Marcus and Ryan!",
         "tags": [
           {
             "signal": "deal closed — onboarding initiated",
@@ -220,8 +220,8 @@
       "prediction": "on_track",
       "outcome": "won",
       "winFactors": [
-        "Built multi-threaded relationship by engaging 2 stakeholders (Legolas Greenleaf, Gimli Gloinsson)",
-        "Legolas Greenleaf responded within hours, indicating strong interest from the outset",
+        "Built multi-threaded relationship by engaging 2 stakeholders (Marcus Chen, Ryan Tanaka)",
+        "Marcus Chen responded within hours, indicating strong interest from the outset",
         "Gained executive sponsorship early, which accelerated procurement approval"
       ],
       "riskFactors": [
@@ -236,10 +236,10 @@
     }
   },
   {
-    "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+    "conversationId": "AQQkADAwATY0MDAADianaThread002==",
     "subject": "Data Protection Gaps in Insurance — How Sophos XDR Can Help",
     "product": "Sophos XDR",
-    "mainContact": "Samwise Gamgee",
+    "mainContact": "Diana Torres",
     "threadTags": [
       {
         "pattern": "deal closed successfully",
@@ -260,8 +260,8 @@
     ],
     "messages": [
       {
-        "id": "AQMkADAwATY0MDAAsamwise001AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana001AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
@@ -270,7 +270,7 @@
           }
         },
         "receivedDateTime": "2026-03-08T09:00:00Z",
-        "bodyPreview": "Hi Samwise, insurance companies are high-value targets — sensitive policyholder data and regulatory pressure make them ideal ransomware candidates. Sophos XDR helped a similar carrier reduce breach risk by 60%.",
+        "bodyPreview": "Hi Diana, insurance companies are high-value targets — sensitive policyholder data and regulatory pressure make them ideal ransomware candidates. Sophos XDR helped a similar carrier reduce breach risk by 60%.",
         "tags": [
           {
             "signal": "outreach/follow-up",
@@ -281,13 +281,13 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise002AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana002AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
-            "name": "Samwise Gamgee",
-            "address": "s.gamgee@shireinsurance.com"
+            "name": "Diana Torres",
+            "address": "d.torres@atlasinsurance.com"
           }
         },
         "receivedDateTime": "2026-03-08T14:00:00Z",
@@ -302,8 +302,8 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise003AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana003AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
@@ -323,17 +323,17 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise004AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana004AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
-            "name": "Samwise Gamgee",
-            "address": "s.gamgee@shireinsurance.com"
+            "name": "Diana Torres",
+            "address": "d.torres@atlasinsurance.com"
           }
         },
         "receivedDateTime": "2026-03-09T08:00:00Z",
-        "bodyPreview": "Tomorrow 9AM works. I'm looping in our CISO Frodo Baggins — he needs to sign off on any security spend over $50k and will want to see the technical details.",
+        "bodyPreview": "Tomorrow 9AM works. I'm looping in our CISO Ethan Reeves — he needs to sign off on any security spend over $50k and will want to see the technical details.",
         "tags": [
           {
             "signal": "looped in additional stakeholder",
@@ -350,13 +350,13 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise005AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana005AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
-            "name": "Frodo Baggins",
-            "address": "f.baggins@shireinsurance.com"
+            "name": "Ethan Reeves",
+            "address": "e.reeves@atlasinsurance.com"
           }
         },
         "receivedDateTime": "2026-03-10T10:00:00Z",
@@ -371,8 +371,8 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise006AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana006AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
@@ -381,7 +381,7 @@
           }
         },
         "receivedDateTime": "2026-03-12T09:00:00Z",
-        "bodyPreview": "Frodo, proposal and ROI model attached. 3-year NPV of $1.2M in risk reduction against industry-average breach cost. Happy to join the board presentation if that would help.",
+        "bodyPreview": "Ethan, proposal and ROI model attached. 3-year NPV of $1.2M in risk reduction against industry-average breach cost. Happy to join the board presentation if that would help.",
         "tags": [
           {
             "signal": "outreach/follow-up",
@@ -392,13 +392,13 @@
         ]
       },
       {
-        "id": "AQMkADAwATY0MDAAsamwise007AAAA==",
-        "conversationId": "AQQkADAwATY0MDAAsamwiseThread002==",
+        "id": "AQMkADAwATY0MDAADiana007AAAA==",
+        "conversationId": "AQQkADAwATY0MDAADianaThread002==",
         "subject": "Re: Data Protection Gaps in Insurance — How Sophos XDR Can Help",
         "from": {
           "emailAddress": {
-            "name": "Frodo Baggins",
-            "address": "f.baggins@shireinsurance.com"
+            "name": "Ethan Reeves",
+            "address": "e.reeves@atlasinsurance.com"
           }
         },
         "receivedDateTime": "2026-03-15T16:00:00Z",
@@ -424,8 +424,8 @@
       "prediction": "on_track",
       "outcome": "won",
       "winFactors": [
-        "Built multi-threaded relationship by engaging 2 stakeholders (Samwise Gamgee, Frodo Baggins)",
-        "Samwise Gamgee responded within hours, indicating strong interest from the outset",
+        "Built multi-threaded relationship by engaging 2 stakeholders (Diana Torres, Ethan Reeves)",
+        "Diana Torres responded within hours, indicating strong interest from the outset",
         "Gained executive sponsorship early, which accelerated procurement approval",
         "Leveraged prospect's urgency (deadline/incident) to maintain deal momentum"
       ],
