@@ -3,10 +3,12 @@ import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { env } from "@/lib/schemas/env.schema";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const COOKIE_OPTS = {
   httpOnly: true,
-  sameSite: "none" as const,
-  secure: true,
+  sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+  secure: isProd,
   path: "/",
 };
 
