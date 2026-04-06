@@ -1,16 +1,59 @@
 import type { EmailTag } from "@/lib/types/thread";
 
-function getTagStyles(direction: EmailTag["direction"], confidence: number): string {
-  if (direction === "neutral") return "bg-gray-100 text-gray-600 ring-gray-200";
+interface TagStyle {
+  background: string;
+  color: string;
+  ringColor: string;
+}
+
+function getTagStyles(
+  direction: EmailTag["direction"],
+  confidence: number,
+): TagStyle {
+  if (direction === "neutral") {
+    return {
+      background: "var(--color-gray-100)",
+      color: "var(--color-gray-550)",
+      ringColor: "var(--color-gray-300)",
+    };
+  }
   if (direction === "negative") {
-    if (confidence >= 0.7) return "bg-red-100 text-red-700 ring-red-200";
-    if (confidence >= 0.4) return "bg-orange-100 text-orange-700 ring-orange-200";
-    return "bg-yellow-100 text-yellow-700 ring-yellow-200";
+    if (confidence >= 0.7)
+      return {
+        background: "var(--color-danger)",
+        color: "var(--color-orange-500)",
+        ringColor: "var(--color-orange-300)",
+      };
+    if (confidence >= 0.4)
+      return {
+        background: "var(--color-warning)",
+        color: "var(--color-orange-400)",
+        ringColor: "var(--color-orange-200)",
+      };
+    return {
+      background: "var(--color-gray-100)",
+      color: "var(--color-gray-550)",
+      ringColor: "var(--color-gray-300)",
+    };
   }
   // positive
-  if (confidence >= 0.7) return "bg-green-100 text-green-700 ring-green-200";
-  if (confidence >= 0.4) return "bg-blue-100 text-blue-700 ring-blue-200";
-  return "bg-purple-100 text-purple-700 ring-purple-200";
+  if (confidence >= 0.7)
+    return {
+      background: "var(--color-success)",
+      color: "var(--color-green-500)",
+      ringColor: "var(--color-green-300)",
+    };
+  if (confidence >= 0.4)
+    return {
+      background: "var(--color-primary)",
+      color: "var(--color-blue-400)",
+      ringColor: "var(--color-blue-300)",
+    };
+  return {
+    background: "var(--color-gray-100)",
+    color: "var(--color-gray-550)",
+    ringColor: "var(--color-gray-300)",
+  };
 }
 
 export default function TagBadge({ tag }: { tag: EmailTag }) {
@@ -19,7 +62,12 @@ export default function TagBadge({ tag }: { tag: EmailTag }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${styles}`}
+      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+      style={{
+        background: styles.background,
+        color: styles.color,
+        boxShadow: `inset 0 0 0 1px ${styles.ringColor}`,
+      }}
       title={`${tag.category} · ${tag.direction} · ${confidence}% confidence`}
     >
       {tag.signal}

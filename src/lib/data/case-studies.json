@@ -43,9 +43,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -91,9 +91,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -160,9 +160,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -274,9 +274,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -295,7 +295,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -316,9 +316,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -364,7 +364,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -385,9 +385,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -475,9 +475,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -540,7 +540,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -626,9 +626,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -680,7 +680,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -700,10 +700,10 @@
         "bodyPreview": "Roy, 2-week deployment at your scale with zero match-day impact — we schedule around your ops calendar. Can replace or coexist with existing AV. Attaching deployment guide for 400-seat environments.",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -786,7 +786,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -834,7 +834,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -924,9 +924,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -945,7 +945,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -965,10 +965,10 @@
         "bodyPreview": "Absolutely. I'll prepare a board-ready risk analysis using your sector's incident data plus a Sophos ROI model. When is the board meeting so I can work to your deadline?",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1016,7 +1016,7 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1097,9 +1097,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1139,9 +1139,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1238,7 +1238,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1280,7 +1280,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1358,9 +1358,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1379,7 +1379,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -1402,7 +1402,7 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1421,7 +1421,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -1442,9 +1442,9 @@
         "tags": [
           {
             "signal": "follow-up sent",
-            "confidence": 0.8,
+            "confidence": 0.7,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1463,9 +1463,9 @@
         "tags": [
           {
             "signal": "follow-up sent",
-            "confidence": 0.8,
+            "confidence": 0.7,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1484,16 +1484,16 @@
         "tags": [
           {
             "signal": "follow-up sent",
-            "confidence": 0.8,
+            "confidence": 0.7,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       }
     ],
     "health": {
-      "healthScore": 20,
-      "prediction": "critical",
+      "healthScore": 43,
+      "prediction": "at_risk",
       "outcome": "stalled",
       "winFactors": [
         "Initial engagement was promising — prospect responded quickly",
@@ -1542,9 +1542,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1563,7 +1563,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -1586,7 +1586,7 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           },
           {
             "signal": "deal closed — onboarding initiated",
@@ -1638,9 +1638,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1730,9 +1730,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1772,9 +1772,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1862,7 +1862,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1904,7 +1904,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -1944,9 +1944,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2030,9 +2030,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2074,7 +2074,7 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2120,9 +2120,9 @@
         "tags": [
           {
             "signal": "follow-up sent",
-            "confidence": 0.8,
+            "confidence": 0.7,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2162,9 +2162,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2251,9 +2251,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2298,10 +2298,16 @@
         "bodyPreview": "Happy to demo Thursday 2PM — I'll walk you through the full Cloud Optix dashboard including the misconfiguration detection and compliance reporting.",
         "tags": [
           {
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
+            "category": "engagement",
+            "direction": "positive"
+          },
+          {
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2340,10 +2346,10 @@
         "bodyPreview": "Michael, you dropped off the demo call after about 10 minutes on Thursday. Happy to reschedule — it happens. What time works this week?",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2361,10 +2367,10 @@
         "bodyPreview": "Hi Michael, one more check-in — is cloud security still a priority for Q1? Happy to work around your schedule.",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2424,10 +2430,10 @@
     "mainContact": "Theon Greyjoy",
     "threadTags": [
       {
-        "pattern": "deal stalled — no response",
-        "score": 0.8,
+        "pattern": "deal lost",
+        "score": 0.9,
         "direction": "negative",
-        "closeLikelihood": 0.15
+        "closeLikelihood": 0.1
       },
       {
         "pattern": "executive stakeholder involved",
@@ -2456,9 +2462,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2477,7 +2483,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -2498,9 +2504,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2540,9 +2546,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2561,9 +2567,9 @@
         "tags": [
           {
             "signal": "follow-up sent",
-            "confidence": 0.8,
+            "confidence": 0.7,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2582,31 +2588,32 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       }
     ],
     "health": {
-      "healthScore": 20,
-      "prediction": "critical",
-      "outcome": "stalled",
+      "healthScore": 35,
+      "prediction": "at_risk",
+      "outcome": "lost",
       "winFactors": [
-        "Initial engagement was promising — prospect responded quickly",
-        "Maintained professional follow-up cadence without being aggressive"
+        "Engaged quickly after initial contact, demonstrating responsiveness",
+        "Maintained professional persistence throughout the sales cycle",
+        "Followed up consistently without being pushy"
       ],
       "riskFactors": [
-        "Prospect disengaged after initial interest — multiple follow-ups went unanswered",
-        "Never expanded beyond a single contact, limiting deal durability",
-        "No clear buying timeline or urgency was established"
+        "Competitor was explicitly preferred — differentiation messaging was insufficient",
+        "Prospect went silent after initial engagement — no response to follow-ups",
+        "Single-threaded engagement meant losing one contact derailed the entire deal"
       ],
       "recommendations": [
-        "Establish a compelling event or deadline early in the sales process to create urgency",
-        "If no response after 3 follow-ups, switch to a different approach (phone, referral, different stakeholder)",
-        "Qualify harder in early conversations — confirm budget, authority, need, and timeline before investing in proposals",
-        "Consider a 'break up' email after extended silence to prompt a definitive response"
+        "When a competitor is mentioned, address differentiation in the same email — don't wait for a separate conversation",
+        "If a prospect goes silent for 5+ days, change the channel — try phone or LinkedIn instead of another email",
+        "Conduct a 'why we lost' analysis within 48 hours of deal loss to capture fresh insights",
+        "Build a competitive battle card with specific rebuttals for the winning vendor's claims"
       ]
     }
   },
@@ -2654,9 +2661,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2675,7 +2682,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -2696,9 +2703,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2744,9 +2751,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2797,10 +2804,10 @@
         "bodyPreview": "Tyrion, Sophos XDR natively ingests Palo Alto syslog and CEF format. I'll set up a live integration demo with a Palo Alto instance. Can we do Friday?",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2913,9 +2920,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -2955,9 +2962,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3005,7 +3012,13 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
+          },
+          {
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
+            "category": "engagement",
+            "direction": "positive"
           }
         ]
       },
@@ -3104,9 +3117,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3125,7 +3138,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3146,9 +3159,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3167,7 +3180,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3188,9 +3201,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3243,10 +3256,10 @@
     "mainContact": "Naomi Nagata",
     "threadTags": [
       {
-        "pattern": "deal stalled — no response",
-        "score": 0.8,
-        "direction": "negative",
-        "closeLikelihood": 0.15
+        "pattern": "deal closed successfully",
+        "score": 0.95,
+        "direction": "positive",
+        "closeLikelihood": 0.95
       },
       {
         "pattern": "executive stakeholder involved",
@@ -3270,9 +3283,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3291,7 +3304,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3312,9 +3325,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3333,7 +3346,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3354,7 +3367,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3383,22 +3396,21 @@
       }
     ],
     "health": {
-      "healthScore": 20,
-      "prediction": "critical",
-      "outcome": "stalled",
+      "healthScore": 92,
+      "prediction": "on_track",
+      "outcome": "won",
       "winFactors": [
-        "Initial engagement was promising — prospect responded quickly",
-        "Maintained professional follow-up cadence without being aggressive"
+        "Naomi Nagata responded within hours, indicating strong interest from the outset",
+        "Gained executive sponsorship early, which accelerated procurement approval"
       ],
       "riskFactors": [
-        "Never expanded beyond a single contact, limiting deal durability",
-        "No clear buying timeline or urgency was established"
+        "Single-threaded engagement — deal depended on one contact, increasing risk"
       ],
       "recommendations": [
-        "Establish a compelling event or deadline early in the sales process to create urgency",
-        "If no response after 3 follow-ups, switch to a different approach (phone, referral, different stakeholder)",
-        "Qualify harder in early conversations — confirm budget, authority, need, and timeline before investing in proposals",
-        "Consider a 'break up' email after extended silence to prompt a definitive response"
+        "Replicate multi-stakeholder engagement pattern — loop in technical and executive contacts early",
+        "Continue providing compliance/regulatory documentation proactively before prospects request it",
+        "Document the winning playbook from this deal for similar industry verticals",
+        "Set internal SLA for proposal delivery: same day or next business day"
       ]
     }
   },
@@ -3430,9 +3442,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3451,7 +3463,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3474,13 +3486,13 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           },
           {
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3519,10 +3531,10 @@
         "bodyPreview": "Joffrey, happy to do a live product comparison. The detection rate and TCO numbers tell a different story than the interface. Can we schedule 30 minutes to dig into specifics?",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3575,10 +3587,10 @@
     "mainContact": "Kira Nerys",
     "threadTags": [
       {
-        "pattern": "deal stalled — no response",
-        "score": 0.8,
-        "direction": "negative",
-        "closeLikelihood": 0.15
+        "pattern": "deal closed successfully",
+        "score": 0.95,
+        "direction": "positive",
+        "closeLikelihood": 0.95
       },
       {
         "pattern": "executive stakeholder involved",
@@ -3602,9 +3614,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3644,9 +3656,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3685,10 +3697,10 @@
         "bodyPreview": "Great call with you and Odo. Attached: a migration plan from your current 6-tool stack to Sophos Central, with a timeline built around your hiring wave. No disruption to existing teams.",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3727,31 +3739,30 @@
         "bodyPreview": "One-pager attached. Covers risk reduction, cost savings vs current stack, and 6-month deployment roadmap. Let me know how the board meeting goes — rooting for you!",
         "tags": [
           {
-            "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       }
     ],
     "health": {
-      "healthScore": 20,
-      "prediction": "critical",
-      "outcome": "stalled",
+      "healthScore": 92,
+      "prediction": "on_track",
+      "outcome": "won",
       "winFactors": [
-        "Initial engagement was promising — prospect responded quickly",
-        "Maintained professional follow-up cadence without being aggressive"
+        "Kira Nerys responded within hours, indicating strong interest from the outset",
+        "Gained executive sponsorship early, which accelerated procurement approval"
       ],
       "riskFactors": [
-        "Never expanded beyond a single contact, limiting deal durability",
-        "No clear buying timeline or urgency was established"
+        "Single-threaded engagement — deal depended on one contact, increasing risk"
       ],
       "recommendations": [
-        "Establish a compelling event or deadline early in the sales process to create urgency",
-        "If no response after 3 follow-ups, switch to a different approach (phone, referral, different stakeholder)",
-        "Qualify harder in early conversations — confirm budget, authority, need, and timeline before investing in proposals",
-        "Consider a 'break up' email after extended silence to prompt a definitive response"
+        "Replicate multi-stakeholder engagement pattern — loop in technical and executive contacts early",
+        "Continue providing compliance/regulatory documentation proactively before prospects request it",
+        "Document the winning playbook from this deal for similar industry verticals",
+        "Set internal SLA for proposal delivery: same day or next business day"
       ]
     }
   },
@@ -3789,9 +3800,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3831,9 +3842,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3852,7 +3863,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -3875,7 +3886,7 @@
             "signal": "sent proposal/pricing",
             "confidence": 0.85,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -3941,10 +3952,10 @@
     "mainContact": "Grima Wormtongue",
     "threadTags": [
       {
-        "pattern": "deal stalled — no response",
-        "score": 0.8,
+        "pattern": "deal lost",
+        "score": 0.9,
         "direction": "negative",
-        "closeLikelihood": 0.15
+        "closeLikelihood": 0.1
       },
       {
         "pattern": "executive stakeholder involved",
@@ -3968,9 +3979,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4010,9 +4021,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4052,9 +4063,9 @@
         "tags": [
           {
             "signal": "outreach/follow-up",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4073,7 +4084,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -4083,20 +4094,20 @@
     "health": {
       "healthScore": 20,
       "prediction": "critical",
-      "outcome": "stalled",
+      "outcome": "lost",
       "winFactors": [
-        "Initial engagement was promising — prospect responded quickly",
-        "Maintained professional follow-up cadence without being aggressive"
+        "Engaged quickly after initial contact, demonstrating responsiveness",
+        "Maintained professional persistence throughout the sales cycle",
+        "Followed up consistently without being pushy"
       ],
       "riskFactors": [
-        "Never expanded beyond a single contact, limiting deal durability",
-        "No clear buying timeline or urgency was established"
+        "Single-threaded engagement meant losing one contact derailed the entire deal",
+        "Failed to establish enough urgency or differentiation to close",
+        "Deal lost momentum in the middle stages without clear recovery action"
       ],
       "recommendations": [
-        "Establish a compelling event or deadline early in the sales process to create urgency",
-        "If no response after 3 follow-ups, switch to a different approach (phone, referral, different stakeholder)",
-        "Qualify harder in early conversations — confirm budget, authority, need, and timeline before investing in proposals",
-        "Consider a 'break up' email after extended silence to prompt a definitive response"
+        "Conduct a 'why we lost' analysis within 48 hours of deal loss to capture fresh insights",
+        "Build a competitive battle card with specific rebuttals for the winning vendor's claims"
       ]
     }
   },
@@ -4140,7 +4151,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4197,10 +4208,16 @@
         "bodyPreview": "Attaching CMMC Level 2 control mapping, our FedRAMP documentation, and a gap analysis template. Can we schedule a call this week to discuss your specific requirements?",
         "tags": [
           {
+            "signal": "scheduled call/meeting",
+            "confidence": 0.85,
+            "category": "engagement",
+            "direction": "positive"
+          },
+          {
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4219,7 +4236,7 @@
         "tags": [
           {
             "signal": "engaged in conversation",
-            "confidence": 0.7,
+            "confidence": 0.6,
             "category": "engagement",
             "direction": "neutral"
           }
@@ -4242,7 +4259,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },
@@ -4290,7 +4307,7 @@
             "signal": "compliance documentation provided",
             "confidence": 0.8,
             "category": "engagement",
-            "direction": "neutral"
+            "direction": "positive"
           }
         ]
       },

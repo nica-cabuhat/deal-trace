@@ -35,12 +35,15 @@ function pickLargestThread(msgs: EmailMessage[]): EmailMessage[] {
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.accessToken || session.error === "RefreshTokenError") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const conversationId = req.nextUrl.searchParams.get("conversationId");
   const subject = req.nextUrl.searchParams.get("subject");
+
+  if (!session?.accessToken || session.error === "RefreshTokenError") {
+    if (process.env.NODE_ENV === "development") {
+      return serveMockThread(conversationId, subject);
+    }
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   if (!conversationId && !subject) {
     return NextResponse.json(
@@ -150,4 +153,46 @@ export async function GET(req: NextRequest) {
   );
 
   return NextResponse.json({ thread });
+}
+
+function serveMockThread(
+  conversationId: string | null,
+  subject: string | null,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const caseStudies = require("@/lib/data/case-studies.json") as Array<{
+    conversationId: string;
+    subject: string;
+    messages: EmailMessage[];
+  }>;
+
+  const normalize = (s: string) =>
+    s.replace(/^(?:(?:RE|FW|FWD)\s*:\s*)+/i, "").trim().toLowerCase();
+
+  const match = caseStudies.find((cs) => {
+    if (conversationId && cs.conversationId === conversationId) return true;
+    if (subject && normalize(cs.subject) === normalize(subject)) return true;
+    if (subject && normalize(cs.subject).includes(normalize(subject)))
+      return true;
+    return false;
+  });
+
+  if (!match) {
+    return NextResponse.json(
+      { error: "No mock thread found for this query" },
+      { status: 404 },
+    );
+  }
+
+  console.log(
+    `[graph/conversation] DEV MOCK: "${match.subject}" — ${match.messages.length} messages`,
+  );
+
+  return NextResponse.json({
+    thread: {
+      conversationId: match.conversationId,
+      subject: match.subject,
+      messages: match.messages,
+    },
+  });
 }

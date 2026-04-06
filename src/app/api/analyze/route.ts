@@ -57,12 +57,15 @@ For each message return an array of tags. Each tag:
 - direction: one of "positive", "negative", "neutral"
 
 Direction classification rules:
-  POSITIVE = prospect action that moves the deal forward:
-    "expressed strong interest", "requested proposal", "looped in decision maker", "CISO approved", "budget approved", "asked for pricing", "scheduled meeting", "attached order form", "ready to sign", "confirmed requirements met", "sent order form", "procurement engaged", "mentioned relevant pain point"
-  NEGATIVE = prospect action that blocks, stalls, or kills the deal:
+  POSITIVE = any action (prospect OR seller) that moves the deal forward:
+    Prospect: "expressed strong interest", "requested proposal", "looped in decision maker", "CISO approved", "budget approved", "asked for pricing", "scheduled meeting", "attached order form", "ready to sign", "confirmed requirements met", "sent order form", "procurement engaged", "mentioned relevant pain point"
+    Seller: "sent proposal/pricing", "scheduled call/meeting", "provided compliance documentation", "sent technical datasheet", "followed up on proposal", "initiated onboarding", "attached order form", "provided ROI analysis", "arranged demo"
+  NEGATIVE = action that blocks, stalls, or kills the deal:
     "raised pricing objection", "mentioned competitor favorably", "expressed decision to not purchase", "said don't contact us", "went silent", "canceled meeting", "budget frozen", "chose another vendor", "expressed hesitation about product", "pushed back on timeline", "no clear resolution to objections", "ghosted after proposal"
-  NEUTRAL = informational only:
-    "asked clarifying question", "shared internal datasheet", "introduced new stakeholder"
+  NEUTRAL = purely informational with no deal impact:
+    "asked clarifying question about logistics", "introduced new stakeholder without context"
+  
+  IMPORTANT: Seller actions that advance the deal (sending proposals, scheduling calls, providing documentation) are ALWAYS "positive", NOT "neutral". Only classify as "neutral" if the action has zero deal progression impact.
 
 CRITICAL: These signals are ALWAYS "negative" with confidence >= 0.95:
   - Prospect explicitly declines to purchase ("We've decided to go with another vendor", "We're not interested", "Don't contact us again")

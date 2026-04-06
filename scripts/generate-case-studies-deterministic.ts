@@ -65,8 +65,8 @@ const PRODUCT_PATTERNS: Array<{ re: RegExp; product: string }> = [
   { re: /\bSophos\s+Cloud\s*(?:Optix|Security)?\b/i, product: "Sophos Cloud Security" },
 ];
 
-const WON_RE = /\b(execute the contract|order form|send the order|PO\b|purchase order|approved|begin immediately|ready to sign|PO is incoming|PO coming|countersigned|send the contract|go-ahead|move forward|want to proceed|prepared to move|let's get this done|sending to procurement)\b/i;
-const LOST_RE = /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different|don't contact us again|cannot proceed|we've made our decision)\b/i;
+const WON_RE = /\b(execute the contract|order form|send the order|PO\b|purchase order|approved|begin immediately|ready to sign|PO is incoming|PO coming|countersigned|send the contract|go-ahead|move forward|want to proceed|prepared to move|let's get this done|sending to procurement|on board|fully on board|get approval|present this|pilot agreement|begin onboarding|ready to move|signed off|we're in|let's proceed|green light|budget approved|we'll take it)\b/i;
+const LOST_RE = /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different|don't contact us again|cannot proceed|we've made our decision|close out this thread|no promises|will not be making)\b/i;
 
 // ── Message-level signal detection ──────────────────────────────────────────
 interface SignalPattern {
@@ -98,10 +98,11 @@ const SIGNAL_PATTERNS: SignalPattern[] = [
   { re: /\b(reassigned|departed|taken over|new.*responsibilities)\b/i, signal: "champion change detected", category: "engagement", direction: "negative", confidence: 0.85, prospectOnly: true },
   { re: /\b(incompatible|unable to make|cannot proceed|clauses)\b/i, signal: "contractual/legal blocker", category: "intent", direction: "negative", confidence: 0.9, prospectOnly: true },
   // Seller signals
-  { re: /\b(proposal|pricing|quote|TCO|ROI)\s*(attached|enclosed|included|sent)\b/i, signal: "sent proposal/pricing", category: "engagement", direction: "neutral", confidence: 0.85, sellerOnly: true },
-  { re: /\b(follow.?up|checking in|any update|still on your radar|last follow.?up)\b/i, signal: "follow-up sent", category: "engagement", direction: "neutral", confidence: 0.8, sellerOnly: true },
+  { re: /\b(proposal|pricing|quote|TCO|ROI)\s*(attached|enclosed|included|sent)\b/i, signal: "sent proposal/pricing", category: "engagement", direction: "positive", confidence: 0.85, sellerOnly: true },
+  { re: /\b(follow.?up|checking in|any update|still on your radar|last follow.?up)\b/i, signal: "follow-up sent", category: "engagement", direction: "positive", confidence: 0.7, sellerOnly: true },
+  { re: /\b(schedule|set up a call|calendar|meeting|call with|demo)\b/i, signal: "scheduled call/meeting", category: "engagement", direction: "positive", confidence: 0.85, sellerOnly: true },
   { re: /\b(welcome to|onboarding|order form attached|countersigned)\b/i, signal: "deal closed — onboarding initiated", category: "intent", direction: "positive", confidence: 0.95, sellerOnly: true },
-  { re: /\b(compliance|SOC\s*2|GDPR|FedRAMP|DPA|sub-processor|attestation|audit)\b/i, signal: "compliance documentation provided", category: "engagement", direction: "neutral", confidence: 0.8, sellerOnly: true },
+  { re: /\b(compliance|SOC\s*2|GDPR|FedRAMP|DPA|sub-processor|attestation|audit)\b/i, signal: "compliance documentation provided", category: "engagement", direction: "positive", confidence: 0.8, sellerOnly: true },
 ];
 
 function tagMessage(msg: EmailMessage): EmailTag[] {
@@ -126,9 +127,9 @@ function tagMessage(msg: EmailMessage): EmailTag[] {
   if (tags.length === 0) {
     tags.push({
       signal: isSeller ? "outreach/follow-up" : "engaged in conversation",
-      confidence: 0.7,
+      confidence: 0.6,
       category: "engagement",
-      direction: "neutral",
+      direction: isSeller ? "positive" : "neutral",
     });
   }
 
@@ -137,13 +138,19 @@ function tagMessage(msg: EmailMessage): EmailTag[] {
 
 // ── Thread-level analysis ───────────────────────────────────────────────────
 function classifyOutcome(thread: EmailThread): Outcome {
+  const allText = thread.messages.map((m) => m.bodyPreview).join(" ");
   const last3 = thread.messages.slice(-3);
-  const text = last3.map((m) => m.bodyPreview).join(" ");
+  const last3Text = last3.map((m) => m.bodyPreview).join(" ");
 
-  // Check lost first — terminal negative signals override positive ones
-  if (LOST_RE.test(text)) return "lost";
-  if (WON_RE.test(text)) return "won";
+  // Check last 3 messages for explicit terminal signals
+  if (LOST_RE.test(last3Text)) return "lost";
+  if (WON_RE.test(last3Text)) return "won";
 
+  // Check full thread for terminal signals (weaker weight but still relevant)
+  if (LOST_RE.test(allText)) return "lost";
+  if (WON_RE.test(allText)) return "won";
+
+  // If last 2+ messages are all seller with no prospect reply → stalled
   const lastMsg = thread.messages[thread.messages.length - 1];
   if (lastMsg?.from.emailAddress.address.includes(SELLER_DOMAIN)) {
     const last2Seller = thread.messages.slice(-2).every((m) =>
@@ -376,8 +383,15 @@ function generateHealth(thread: EmailThread, outcome: Outcome): ThreadHealth {
     score = externalFactor ? Math.min(50, 30 + executionBonus) : Math.min(30, 15 + executionBonus);
     prediction = externalFactor ? "at_risk" : "critical";
   } else {
-    score = 20;
-    prediction = "critical";
+    // Stalled — score based on engagement level before stall
+    const engagementBonus = (hasMultiThread ? 10 : 0) +
+      (hasExecutive ? 10 : 0) +
+      (hasProposal ? 8 : 0) +
+      (fastInitialResponse ? 5 : 0) +
+      (hasCompliance ? 5 : 0) +
+      (hasUrgency ? 5 : 0);
+    score = Math.min(55, 20 + engagementBonus);
+    prediction = score >= 40 ? "at_risk" : "critical";
   }
 
   return {

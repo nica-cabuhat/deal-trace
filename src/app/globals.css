@@ -4,6 +4,20 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  /* Effects */
+  --shadow-card-light: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
+  --shadow-card-dark: 0px 0px 6px 0px rgba(0, 0, 0, 0.5);
+  --shadow-menu-light: 0px 2px 8px 0px rgba(0, 0, 0, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
   /* Sophos design tokens */
   --color-sophos-blue: oklch(0.45 0.2995 267.3);
   --color-blue-35: oklch(93.84% 0.0358 228.42);
@@ -55,18 +69,10 @@
   --color-gray-850: oklch(26.42% 0.004 264.5);
   --color-gray-900: oklch(23.48% 0.0041 264.49);
   --color-gray-950: oklch(15.95% 0.0021 286.16);
-
-  /* Effects */
-  --shadow-card-light: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
-  --shadow-card-dark: 0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-  --shadow-menu-light: 0px 2px 8px 0px rgba(0, 0, 0, 0.5);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-success: oklch(0.9507 0.0208 152.18);
+  --color-primary: oklch(0.9478 0.0183 250.59);
+  --color-danger: oklch(0.953 0.0189 46.81);
+  --color-warning: oklch(0.9717 0.0231 75.86);
 }
 
 @media (prefers-color-scheme: dark) {

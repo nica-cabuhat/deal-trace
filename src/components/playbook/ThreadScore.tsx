@@ -13,11 +13,7 @@ const PREDICTION_LABELS: Record<ThreadHealth["prediction"], string> = {
   critical: "Critical",
 };
 
-function gaugeColor(prediction: ThreadHealth["prediction"]): string {
-  if (prediction === "on_track") return "var(--color-green-400)";
-  if (prediction === "at_risk") return "var(--color-orange-400)";
-  return "var(--color-orange-500)";
-}
+const GRADIENT_ID = "state-b-rainbow";
 
 function HalfCircleGauge({
   score,
@@ -27,50 +23,65 @@ function HalfCircleGauge({
   prediction: ThreadHealth["prediction"];
 }) {
   const filled = HALF * (score / 100);
-  const color = gaugeColor(prediction);
   const label = PREDICTION_LABELS[prediction];
 
   return (
-    <div className="flex flex-col items-center">
-      {/* viewBox height 108 clips the bottom half (circle bottom reaches y=175, outside view) */}
+    <div className="flex justify-center">
       <svg
-        viewBox="0 0 200 108"
+        viewBox="0 0 200 112"
         width="160"
-        height="86"
+        height="90"
         role="img"
         aria-label={`Deal health score: ${score}%, ${label}`}
       >
-        {/* Background half-arc */}
+        <defs>
+          <linearGradient
+            id={GRADIENT_ID}
+            x1="175"
+            y1="0"
+            x2="25"
+            y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="20%" stopColor="#f97316" />
+            <stop offset="40%" stopColor="#facc15" />
+            <stop offset="60%" stopColor="#3b82f6" />
+            <stop offset="80%" stopColor="#14b8a6" />
+            <stop offset="100%" stopColor="#22c55e" />
+          </linearGradient>
+        </defs>
+        {/* Gray background arc */}
         <circle
           cx="100"
           cy="100"
           r="75"
           fill="none"
           stroke="var(--color-gray-200)"
-          strokeWidth="12"
+          strokeWidth="14"
           strokeLinecap="round"
           strokeDasharray={`${HALF} ${CIRC}`}
           transform="rotate(180 100 100)"
         />
-        {/* Score fill arc */}
+        {/* Rainbow fill arc — clipped to score */}
         <circle
           cx="100"
           cy="100"
           r="75"
           fill="none"
-          stroke={color}
-          strokeWidth="12"
+          stroke={`url(#${GRADIENT_ID})`}
+          strokeWidth="14"
           strokeLinecap="round"
           strokeDasharray={`${filled} ${CIRC}`}
           transform="rotate(180 100 100)"
         />
-        {/* Score label */}
+        {/* Labels */}
         <text
           x="100"
           y="88"
           textAnchor="middle"
           fill="var(--color-gray-900)"
-          fontSize="24"
+          fontSize="22"
           fontWeight="700"
         >
           {score}%
@@ -79,9 +90,8 @@ function HalfCircleGauge({
           x="100"
           y="104"
           textAnchor="middle"
-          fill={color}
+          fill="var(--color-gray-500)"
           fontSize="11"
-          fontWeight="500"
         >
           {label}
         </text>

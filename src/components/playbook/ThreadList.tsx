@@ -42,9 +42,12 @@ function ScoreBadge({ health }: { health: ThreadHealth }) {
 }
 
 function MessageRow({ message }: { message: EmailMessage }) {
-  const date = new Date(message.receivedDateTime).toLocaleString(undefined, {
+  const dt = new Date(message.receivedDateTime);
+  const datePart = dt.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
+  });
+  const timePart = dt.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -55,15 +58,25 @@ function MessageRow({ message }: { message: EmailMessage }) {
       style={{ borderColor: "var(--color-gray-150)" }}
     >
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
-        <span className="text-xs font-medium" style={{ color: "var(--color-gray-800)" }}>
-          {message.from.emailAddress.name}
-          <span className="ml-1 font-normal" style={{ color: "var(--color-gray-500)" }}>
+        <p className="text-xs font-medium flex flex-col">
+          <span style={{ color: "var(--color-gray-800)" }}>
+            {message.from.emailAddress.name}
+          </span>
+          <span
+            className="font-normal"
+            style={{ color: "var(--color-gray-500)" }}
+          >
             &lt;{message.from.emailAddress.address}&gt;
           </span>
-        </span>
-        <span className="shrink-0 text-xs" style={{ color: "var(--color-gray-450)" }}>
-          {date}
-        </span>
+        </p>
+        <p
+          className="shrink-0 text-right text-xs"
+          style={{ color: "var(--color-gray-450)" }}
+        >
+          <span>{datePart}</span>
+          <br />
+          <span>{timePart}</span>
+        </p>
       </div>
       <p className="text-xs" style={{ color: "var(--color-gray-600)" }}>
         {message.bodyPreview}
@@ -88,32 +101,47 @@ function RainbowGauge({
   prediction: ThreadHealth["prediction"];
   gradientId: string;
 }) {
-  const angle = Math.PI * (1 - score / 100);
-  const dotX = 100 + 75 * Math.cos(angle);
-  const dotY = 100 - 75 * Math.sin(angle);
+  const filled = HALF * (score / 100);
   const label = PREDICTION_LABELS[prediction];
 
   return (
     <div className="flex justify-center">
-      <svg viewBox="0 0 200 112" width="160" height="90" aria-label={`${score}%, ${label}`}>
+      <svg
+        viewBox="0 0 200 112"
+        width="160"
+        height="90"
+        aria-label={`${score}%, ${label}`}
+      >
         <defs>
           <linearGradient
             id={gradientId}
-            x1="25"
+            x1="175"
             y1="0"
-            x2="175"
+            x2="25"
             y2="0"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#3b82f6" />
-            <stop offset="20%" stopColor="#14b8a6" />
-            <stop offset="40%" stopColor="#22c55e" />
-            <stop offset="60%" stopColor="#facc15" />
-            <stop offset="80%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#ef4444" />
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="20%" stopColor="#f97316" />
+            <stop offset="40%" stopColor="#facc15" />
+            <stop offset="60%" stopColor="#3b82f6" />
+            <stop offset="80%" stopColor="#14b8a6" />
+            <stop offset="100%" stopColor="#22c55e" />
           </linearGradient>
         </defs>
-        {/* Rainbow arc */}
+        {/* Gray background arc */}
+        <circle
+          cx="100"
+          cy="100"
+          r="75"
+          fill="none"
+          stroke="var(--color-gray-200)"
+          strokeWidth="14"
+          strokeLinecap="round"
+          strokeDasharray={`${HALF} ${CIRC}`}
+          transform="rotate(180 100 100)"
+        />
+        {/* Rainbow fill arc — clipped to score */}
         <circle
           cx="100"
           cy="100"
@@ -122,11 +150,9 @@ function RainbowGauge({
           stroke={`url(#${gradientId})`}
           strokeWidth="14"
           strokeLinecap="round"
-          strokeDasharray={`${HALF} ${CIRC}`}
+          strokeDasharray={`${filled} ${CIRC}`}
           transform="rotate(180 100 100)"
         />
-        {/* Score indicator */}
-        <circle cx={dotX} cy={dotY} r="5" fill="var(--color-gray-800)" />
         {/* Labels */}
         <text
           x="100"
@@ -160,8 +186,14 @@ function DealAnalysisSummary({
   gradientId: string;
 }) {
   const isWon = health.outcome === "won";
-  const outcomeLabel = isWon ? "Won" : health.outcome === "lost" ? "Lost" : "Concluded";
-  const outcomeColor = isWon ? "var(--color-green-400)" : "var(--color-orange-500)";
+  const outcomeLabel = isWon
+    ? "Won"
+    : health.outcome === "lost"
+      ? "Lost"
+      : "Concluded";
+  const outcomeColor = isWon
+    ? "var(--color-green-400)"
+    : "var(--color-orange-500)";
 
   return (
     <div
@@ -177,7 +209,12 @@ function DealAnalysisSummary({
         </p>
         <span
           className="rounded-full px-2 py-0.5 text-xs font-semibold"
-          style={{ background: isWon ? "var(--color-green-50)" : "var(--color-orange-50)", color: outcomeColor }}
+          style={{
+            background: isWon
+              ? "var(--color-green-50)"
+              : "var(--color-orange-50)",
+            color: outcomeColor,
+          }}
         >
           {outcomeLabel}
         </span>
@@ -204,7 +241,10 @@ function DealAnalysisSummary({
                 className="flex gap-1.5 text-xs"
                 style={{ color: "var(--color-gray-700)" }}
               >
-                <span className="mt-0.5 shrink-0" style={{ color: "var(--color-green-400)" }}>
+                <span
+                  className="mt-0.5 shrink-0"
+                  style={{ color: "var(--color-green-400)" }}
+                >
                   ✓
                 </span>
                 {f}
@@ -226,7 +266,10 @@ function DealAnalysisSummary({
                 className="flex gap-1.5 text-xs"
                 style={{ color: "var(--color-gray-700)" }}
               >
-                <span className="mt-0.5 shrink-0" style={{ color: "var(--color-orange-400)" }}>
+                <span
+                  className="mt-0.5 shrink-0"
+                  style={{ color: "var(--color-orange-400)" }}
+                >
                   ✕
                 </span>
                 {f}
@@ -270,16 +313,26 @@ interface ThreadCardProps {
   health?: ThreadHealth;
   isLoading?: boolean;
   isSelected?: boolean;
+  isOpen?: boolean;
+  onToggle?: () => void;
   // State A: expand accordion + auto-analyze on first open
   onExpand?: (thread: EmailThread) => void;
   // State B list: click navigates to that thread, no expansion
   onSelect?: (thread: EmailThread) => void;
 }
 
-function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHealth }) {
-  const prospectName = thread.mainContact ?? thread.messages.find(
-    (m) => !m.from.emailAddress.address.includes("sophos.com"),
-  )?.from.emailAddress.name;
+function CardHeader({
+  thread,
+  health,
+}: {
+  thread: EmailThread;
+  health?: ThreadHealth;
+}) {
+  const prospectName =
+    thread.mainContact ??
+    thread.messages.find(
+      (m) => !m.from.emailAddress.address.includes("sophos.com"),
+    )?.from.emailAddress.name;
 
   const prospectEmail = thread.messages.find(
     (m) => !m.from.emailAddress.address.includes("sophos.com"),
@@ -297,19 +350,18 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
       </div>
       {prospectName && (
         <p
-          className="mb-0.5 truncate text-xs"
+          className="mb-0.5 truncate text-xs flex flex-col"
           style={{ color: "var(--color-gray-500)" }}
         >
           {prospectName}
           {prospectEmail && (
-            <span className="ml-1 opacity-70">
-              &lt;{prospectEmail}&gt;
-            </span>
+            <span className="opacity-70">&lt;{prospectEmail}&gt;</span>
           )}
         </p>
       )}
       <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-400)" }}>
-        {thread.messages.length} message{thread.messages.length !== 1 ? "s" : ""}
+        {thread.messages.length} message
+        {thread.messages.length !== 1 ? "s" : ""}
       </p>
       <div className="flex items-center justify-between">
         {thread.product && (
@@ -317,7 +369,7 @@ function CardHeader({ thread, health }: { thread: EmailThread; health?: ThreadHe
             className="inline-flex items-center rounded-full px-2 py-0.5 font-medium"
             style={{
               fontSize: "10px",
-              background: "var(--color-blue-35)",
+              background: "var(--color-primary)",
               color: "var(--color-sophos-blue)",
             }}
           >
@@ -335,10 +387,11 @@ function ThreadCard({
   health,
   isLoading,
   isSelected,
+  isOpen: open = false,
+  onToggle,
   onExpand,
   onSelect,
 }: ThreadCardProps) {
-  const [open, setOpen] = useState(false);
   const previewText = thread.messages[0]?.bodyPreview;
   const gradientId = `rainbow-${thread.conversationId}`;
 
@@ -354,7 +407,9 @@ function ThreadCard({
         style={{
           borderColor: cardBorder,
           boxShadow: "var(--shadow-card-light)",
-          ...(isSelected ? { boxShadow: "0 0 0 1px var(--color-sophos-blue)" } : {}),
+          ...(isSelected
+            ? { boxShadow: "0 0 0 1px var(--color-sophos-blue)" }
+            : {}),
         }}
       >
         <button
@@ -366,13 +421,13 @@ function ThreadCard({
           <CardHeader thread={thread} health={health} />
           {previewText && (
             <p
-              className="mt-1.5 text-xs"
+              className="mt-1.5 overflow-hidden text-xs leading-4"
               style={{
                 color: "var(--color-gray-600)",
+                maxHeight: "2rem",
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
+                WebkitBoxOrient: "vertical" as const,
                 textOverflow: "ellipsis",
               }}
             >
@@ -396,7 +451,7 @@ function ThreadCard({
       <Root
         open={open}
         onOpenChange={(next) => {
-          setOpen(next);
+          onToggle?.();
           if (next) onExpand?.(thread);
         }}
       >
@@ -417,19 +472,23 @@ function ThreadCard({
             aria-hidden="true"
             style={{ color: "var(--color-gray-400)" }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </Trigger>
 
         {!open && previewText && (
           <p
-            className="px-3 pb-2 text-xs"
+            className="overflow-hidden px-3 pb-2 text-xs leading-4"
             style={{
               color: "var(--color-gray-600)",
+              maxHeight: "2rem",
               display: "-webkit-box",
               WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
+              WebkitBoxOrient: "vertical" as const,
               textOverflow: "ellipsis",
             }}
           >
@@ -443,8 +502,14 @@ function ThreadCard({
             style={{ borderColor: "var(--color-gray-150)" }}
           >
             {isLoading ? (
-              <div className="flex flex-col gap-2 py-4 animate-pulse" aria-busy="true">
-                <div className="h-3 rounded" style={{ background: "var(--color-gray-100)" }} />
+              <div
+                className="flex flex-col gap-2 py-4 animate-pulse"
+                aria-busy="true"
+              >
+                <div
+                  className="h-3 rounded"
+                  style={{ background: "var(--color-gray-100)" }}
+                />
                 <div
                   className="h-3 w-4/5 rounded"
                   style={{ background: "var(--color-gray-100)" }}
@@ -460,7 +525,10 @@ function ThreadCard({
                   <MessageRow key={message.id} message={message} />
                 ))}
                 {health && (
-                  <DealAnalysisSummary health={health} gradientId={gradientId} />
+                  <DealAnalysisSummary
+                    health={health}
+                    gradientId={gradientId}
+                  />
                 )}
               </>
             )}
@@ -513,6 +581,8 @@ export default function ThreadList({
   onExpand,
   onSelect,
 }: ThreadListProps) {
+  const [openId, setOpenId] = useState<string | null>(null);
+
   if (threads.length === 0) {
     return (
       <p
@@ -533,7 +603,14 @@ export default function ThreadList({
             health={healthMap[thread.conversationId]}
             isLoading={loadingId === thread.conversationId}
             isSelected={
-              onSelect != null && selectedConversationId === thread.conversationId
+              onSelect != null &&
+              selectedConversationId === thread.conversationId
+            }
+            isOpen={openId === thread.conversationId}
+            onToggle={() =>
+              setOpenId((prev) =>
+                prev === thread.conversationId ? null : thread.conversationId,
+              )
             }
             onExpand={onExpand}
             onSelect={onSelect}

@@ -11,7 +11,7 @@ import { useConversationThread } from "@/lib/queries/useConversationThread";
 import ThreadList from "@/components/playbook/ThreadList";
 import ThreadScore from "@/components/playbook/ThreadScore";
 import TagBadge from "@/components/playbook/TagBadge";
-import { getPatternStats } from "@/lib/deal/patternLibrary";
+import type { PatternStats } from "@/lib/deal/patternLibrary";
 
 interface CaseStudyEntry {
   conversationId: string;
@@ -38,7 +38,12 @@ const cachedHealthMap: Record<string, ThreadHealth> = Object.fromEntries(
   caseStudies.map((cs) => [cs.conversationId, cs.health]),
 );
 
-const patternStats = getPatternStats();
+const patternStats: PatternStats = {
+  total: caseStudies.length,
+  won: caseStudies.filter((cs) => cs.health.outcome === "won").length,
+  lost: caseStudies.filter((cs) => cs.health.outcome === "lost").length,
+  stalled: caseStudies.filter((cs) => cs.health.outcome !== "won" && cs.health.outcome !== "lost").length,
+};
 
 /** Strip Exchange legacy DN paths from sender display names. */
 function cleanName(raw: string): string {
@@ -81,8 +86,8 @@ function isDealEmail(thread: EmailThread): boolean {
   if (allSystem) return false;
 
   const domains = new Set(
-    thread.messages.map((m) =>
-      m.from.emailAddress.address.toLowerCase().split("@")[1],
+    thread.messages.map(
+      (m) => m.from.emailAddress.address.toLowerCase().split("@")[1],
     ),
   );
   const hasSellerDomain = domains.has(SELLER_DOMAIN);
@@ -102,8 +107,8 @@ function DevMailboxHint() {
       className="px-4 pt-2 text-center text-xs leading-snug"
       style={{ color: "var(--color-gray-450)" }}
     >
-      The Outlook add-in loads <code className="font-mono">/taskpane</code> with Office.js. On
-      this page use query params to simulate a message, e.g.{" "}
+      The Outlook add-in loads <code className="font-mono">/taskpane</code> with
+      Office.js. On this page use query params to simulate a message, e.g.{" "}
       <code className="font-mono">?subject=Your+Subject</code> or{" "}
       <code className="font-mono">?conv=…</code>.
     </p>
@@ -117,7 +122,13 @@ function AppHeader() {
       style={{ borderColor: "var(--color-gray-200)", background: "white" }}
     >
       <div className="flex items-center gap-2">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.5C16.5 22.15 20 17.25 20 12V6L12 2z"
             fill="var(--color-sophos-blue)"
@@ -130,7 +141,10 @@ function AppHeader() {
             strokeLinejoin="round"
           />
         </svg>
-        <span className="text-sm font-bold" style={{ color: "var(--color-sophos-blue)" }}>
+        <span
+          className="text-sm font-bold"
+          style={{ color: "var(--color-sophos-blue)" }}
+        >
           DealTrace
         </span>
       </div>
@@ -147,7 +161,17 @@ function AppHeader() {
         aria-label="Close and reopen for current email"
         title="Close — reopen from ribbon to sync"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--color-gray-500)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
           <path d="M21 2v6h-6" />
           <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
           <path d="M3 22v-6h6" />
@@ -159,9 +183,12 @@ function AppHeader() {
 }
 
 function MessageRow({ message }: { message: EmailMessage }) {
-  const date = new Date(message.receivedDateTime).toLocaleString(undefined, {
+  const dt = new Date(message.receivedDateTime);
+  const datePart = dt.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
+  });
+  const timePart = dt.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -172,17 +199,25 @@ function MessageRow({ message }: { message: EmailMessage }) {
       style={{ borderColor: "var(--color-gray-150)" }}
     >
       <div className="mb-0.5 flex items-baseline justify-between gap-2">
-        <span className="text-xs font-medium" style={{ color: "var(--color-gray-800)" }}>
+        <p
+          className="text-xs font-medium flex flex-col"
+          style={{ color: "var(--color-gray-800)" }}
+        >
           {cleanName(message.from.emailAddress.name)}
           {isEmail(message.from.emailAddress.address) && (
-            <span className="ml-1 font-normal" style={{ color: "var(--color-gray-500)" }}>
+            <span
+              className="font-normal"
+              style={{ color: "var(--color-gray-500)" }}
+            >
               &lt;{message.from.emailAddress.address}&gt;
             </span>
           )}
-        </span>
-        <span className="shrink-0 text-xs" style={{ color: "var(--color-gray-450)" }}>
-          {date}
-        </span>
+        </p>
+        <p className="shrink-0 text-right text-xs" style={{ color: "var(--color-gray-450)" }}>
+          <span>{datePart}</span>
+          <br />
+          <span>{timePart}</span>
+        </p>
       </div>
       <p className="text-xs" style={{ color: "var(--color-gray-600)" }}>
         {message.bodyPreview}
@@ -199,7 +234,7 @@ function MessageRow({ message }: { message: EmailMessage }) {
 }
 
 function SelectedThreadCard({ thread }: { thread: EmailThread }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <article
@@ -231,23 +266,42 @@ function SelectedThreadCard({ thread }: { thread: EmailThread }) {
               aria-hidden="true"
               style={{ color: "var(--color-gray-400)" }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
-          {thread.messages[0] && (
-            <p className="mb-1.5 text-xs" style={{ color: "var(--color-gray-500)" }}>
-              {cleanName(thread.messages[0].from.emailAddress.name)}
-              {isEmail(thread.messages[0].from.emailAddress.address) && (
-                <span className="ml-1 opacity-70">
-                  &lt;{thread.messages[0].from.emailAddress.address}&gt;
+          {(() => {
+            const contact = thread.messages.find(
+              (m) =>
+                !m.from.emailAddress.address
+                  .toLowerCase()
+                  .includes(SELLER_DOMAIN),
+            );
+            const contactName = contact
+              ? cleanName(contact.from.emailAddress.name)
+              : cleanName(thread.messages[0]?.from.emailAddress.name ?? "");
+            const contactEmail =
+              contact?.from.emailAddress.address ??
+              thread.messages[0]?.from.emailAddress.address;
+            return contactName ? (
+              <p
+                className="mb-1.5 flex flex-col text-xs"
+                style={{ color: "var(--color-gray-500)" }}
+              >
+                <span>{contactName}</span>
+                {contactEmail && isEmail(contactEmail) && (
+                  <span className="opacity-70">&lt;{contactEmail}&gt;</span>
+                )}
+                <span className="opacity-50">
+                  {thread.messages.length} message
+                  {thread.messages.length !== 1 ? "s" : ""}
                 </span>
-              )}
-              <span className="ml-1 opacity-50">
-                · {thread.messages.length} message
-                {thread.messages.length !== 1 ? "s" : ""}
-              </span>
-            </p>
-          )}
+              </p>
+            ) : null;
+          })()}
           {thread.product && (
             <span
               className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
@@ -281,7 +335,9 @@ export default function SamplePage() {
   const [urlMailboxConversationId, setUrlMailboxConversationId] = useState<
     string | null
   >(null);
-  const [urlMailboxSubject, setUrlMailboxSubject] = useState<string | null>(null);
+  const [urlMailboxSubject, setUrlMailboxSubject] = useState<string | null>(
+    null,
+  );
 
   // ── State B: live thread from real Outlook conversation ────────────────────
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
@@ -289,7 +345,9 @@ export default function SamplePage() {
   const [isLiveAnalyzing, setIsLiveAnalyzing] = useState(false);
   const [isLiveScoring, setIsLiveScoring] = useState(false);
   const [liveDraftingId, setLiveDraftingId] = useState<string | null>(null);
-  const [liveProjectedScore, setLiveProjectedScore] = useState<number | undefined>();
+  const [liveProjectedScore, setLiveProjectedScore] = useState<
+    number | undefined
+  >();
   const [isAllThreadsOpen, setIsAllThreadsOpen] = useState(false);
   const lastLiveConvId = useRef<string | null>(null);
 
@@ -301,19 +359,17 @@ export default function SamplePage() {
     setShowSampleDevHint(path === "/sample" || path.endsWith("/sample"));
   }, []);
 
-  const {
-    conversationId: officeConversationId,
-    itemSubject: officeSubject,
-  } = useMailboxConversation({
-    onConversationChanged: () => {
-      setLiveThread(null);
-      setLiveHealth(null);
-      setLiveProjectedScore(undefined);
-      setIsLiveAnalyzing(false);
-      setIsLiveScoring(false);
-      lastLiveConvId.current = null;
-    },
-  });
+  const { conversationId: officeConversationId, itemSubject: officeSubject } =
+    useMailboxConversation({
+      onConversationChanged: () => {
+        setLiveThread(null);
+        setLiveHealth(null);
+        setLiveProjectedScore(undefined);
+        setIsLiveAnalyzing(false);
+        setIsLiveScoring(false);
+        lastLiveConvId.current = null;
+      },
+    });
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -321,7 +377,8 @@ export default function SamplePage() {
     setUrlMailboxSubject(p.get("subject"));
   }, []);
 
-  const mailboxConversationId = officeConversationId ?? urlMailboxConversationId;
+  const mailboxConversationId =
+    officeConversationId ?? urlMailboxConversationId;
   const mailboxSubject = officeSubject ?? urlMailboxSubject;
   const hasMailboxContext = !!(mailboxConversationId || mailboxSubject);
 
@@ -412,7 +469,8 @@ export default function SamplePage() {
 
         setLiveHealth((prev) => {
           const base = prev ?? result;
-          const boost = base.healthScore >= 80 ? 5 : base.healthScore >= 50 ? 10 : 15;
+          const boost =
+            base.healthScore >= 80 ? 5 : base.healthScore >= 50 ? 10 : 15;
           setLiveProjectedScore(Math.min(98, base.healthScore + boost));
           return { ...base, draftEmail: result.draftEmail };
         });
@@ -439,7 +497,10 @@ export default function SamplePage() {
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
             <div
               className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
-              style={{ borderColor: "var(--color-sophos-blue)", borderTopColor: "transparent" }}
+              style={{
+                borderColor: "var(--color-sophos-blue)",
+                borderTopColor: "transparent",
+              }}
             />
             <p className="text-sm" style={{ color: "var(--color-gray-500)" }}>
               {isLoadingConversation
@@ -461,7 +522,10 @@ export default function SamplePage() {
           <AppHeader />
           {showSampleDevHint && <DevMailboxHint />}
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
-            <h2 className="text-sm font-semibold" style={{ color: "var(--color-gray-600)" }}>
+            <h2
+              className="text-sm font-semibold"
+              style={{ color: "var(--color-gray-600)" }}
+            >
               Selected Deal Thread
             </h2>
 
@@ -488,7 +552,9 @@ export default function SamplePage() {
                 onClick={() => setIsAllThreadsOpen((v) => !v)}
                 aria-expanded={isAllThreadsOpen}
               >
-                {isAllThreadsOpen ? "Hide Deal Threads" : "Show All Deal Threads"}
+                {isAllThreadsOpen
+                  ? "Hide Deal Threads"
+                  : "Show All Deal Threads"}
               </button>
 
               {isAllThreadsOpen && (
@@ -522,7 +588,10 @@ export default function SamplePage() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
-            style={{ borderColor: "var(--color-sophos-blue)", borderTopColor: "transparent" }}
+            style={{
+              borderColor: "var(--color-sophos-blue)",
+              borderTopColor: "transparent",
+            }}
           />
           <p className="text-sm" style={{ color: "var(--color-gray-500)" }}>
             Analyzing deal signals…
@@ -543,7 +612,10 @@ export default function SamplePage() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
-            style={{ borderColor: "var(--color-sophos-blue)", borderTopColor: "transparent" }}
+            style={{
+              borderColor: "var(--color-sophos-blue)",
+              borderTopColor: "transparent",
+            }}
           />
           <p className="text-sm" style={{ color: "var(--color-gray-500)" }}>
             Loading conversation…
@@ -561,20 +633,35 @@ export default function SamplePage() {
       >
         <AppHeader />
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.5C16.5 22.15 20 17.25 20 12V6L12 2z"
               stroke="var(--color-gray-300)"
               strokeWidth="1.5"
               fill="none"
             />
-            <path d="M12 8v4M12 14h.01" stroke="var(--color-gray-400)" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M12 8v4M12 14h.01"
+              stroke="var(--color-gray-400)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
-          <p className="text-sm font-medium" style={{ color: "var(--color-gray-700)" }}>
+          <p
+            className="text-sm font-medium"
+            style={{ color: "var(--color-gray-700)" }}
+          >
             Sign in to analyze this thread
           </p>
           <p className="text-xs" style={{ color: "var(--color-gray-450)" }}>
-            DealTrace needs access to your mailbox to read the full conversation.
+            DealTrace needs access to your mailbox to read the full
+            conversation.
           </p>
           <button
             type="button"
@@ -605,7 +692,10 @@ export default function SamplePage() {
           >
             All Deal Threads
           </h2>
-          <p className="mt-0.5 text-xs" style={{ color: "var(--color-gray-450)" }}>
+          <p
+            className="mt-0.5 text-xs"
+            style={{ color: "var(--color-gray-450)" }}
+          >
             Based on {patternStats.won} won and {patternStats.lost} lost deals
           </p>
         </div>
@@ -616,10 +706,7 @@ export default function SamplePage() {
         >
           Download Rep Playbook
         </button>
-        <ThreadList
-          threads={cachedThreads}
-          healthMap={cachedHealthMap}
-        />
+        <ThreadList threads={cachedThreads} healthMap={cachedHealthMap} />
       </div>
     </div>
   );

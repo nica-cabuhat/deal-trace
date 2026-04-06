@@ -16,10 +16,10 @@ interface DealPattern {
 const SELLER_DOMAIN = "sophos.com";
 
 const WON_INDICATORS =
-  /\b(execute the contract|order form|send the order|PO\b|purchase order|approved|begin immediately|ready to sign|PO is incoming|PO coming|countersigned|send the contract|go-ahead|move forward|want to proceed|prepared to move|let's get this done|sending to procurement)\b/i;
+  /\b(execute the contract|order form|send the order|PO\b|purchase order|approved|begin immediately|ready to sign|PO is incoming|PO coming|countersigned|send the contract|go-ahead|move forward|want to proceed|prepared to move|let's get this done|sending to procurement|on board|fully on board|get approval|present this|pilot agreement|begin onboarding|ready to move|signed off|we're in|let's proceed|green light|budget approved|we'll take it)\b/i;
 
 const LOST_INDICATORS =
-  /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different|cannot proceed|we've made our decision)\b/i;
+  /\b(different direction|another vendor|going with|chose .+?(crowdstrike|sentinelone|competitor)|not interested|don't contact|matter is closed|decided to build|in-house|staying with our current|pause new security|decided to go in a different|cannot proceed|we've made our decision|close out this thread|no promises|will not be making)\b/i;
 
 const PRODUCT_RE =
   /\bSophos\s+(Intercept\s*X|MDR|XDR|Firewall|Central|Endpoint|Email|ZTNA|Cloud\s*(?:Optix|Security))\b/i;
