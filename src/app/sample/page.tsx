@@ -49,18 +49,26 @@ function isEmail(addr: string): boolean {
   return addr.includes("@");
 }
 
-const DEAL_KEYWORDS =
-  /\b(sophos|intercept\s*x|mdr|xdr|firewall|central|endpoint|ztna|cyber\s*security|threat|ransomware|migration|license|renewal|proof\s*of\s*concept|poc|demo|pricing|quote)\b/i;
+const SELLER_DOMAIN = "sophos.com";
+
+const SOPHOS_PRODUCT_KEYWORDS =
+  /\b(sophos|intercept\s*x|mdr|xdr|firewall|central|endpoint|ztna|cyber\s*security|threat\s*protect|ransomware\s*protect|proof\s*of\s*concept|poc)\b/i;
+
+const DEAL_STAGE_KEYWORDS =
+  /\b(pricing|quote|proposal|demo|trial|purchase\s*order|PO\b|contract|procurement|budget|roi|deployment|implementation|onboarding|pilot)\b/i;
+
+const NON_DEAL_KEYWORDS =
+  /\b(hmo|benefits|payroll|company\s*id|employee\s*id|registration\s*deadline|batch\s*processing|hr\s*department|human\s*resources|leave\s*request|time\s*off|attendance|performance\s*review|onboarding\s*form|tax\s*form|w-?2|w-?4|1099|pay\s*stub|direct\s*deposit|open\s*enrollment|health\s*insurance|dental|vision|401k|retirement|pto|sick\s*leave|maternity|paternity|training\s*session|team\s*building|office\s*closure|holiday\s*schedule|memo|announcement|newsletter|bulletin|survey|feedback\s*form|it\s*support|password\s*reset|vpn|wifi|parking|badge|key\s*card|cafeteria)\b/i;
 
 const SYSTEM_SENDERS =
-  /\b(noreply|no-reply|account-security|mailer-daemon|postmaster|notifications?|support@|billing@|newsletter)\b/i;
+  /\b(noreply|no-reply|account-security|mailer-daemon|postmaster|notifications?|support@|billing@|newsletter|hr@|human\.?resources|admin@|helpdesk)\b/i;
 
 function isDealEmail(thread: EmailThread): boolean {
-  for (const m of thread.messages) {
-    if (DEAL_KEYWORDS.test(m.subject) || DEAL_KEYWORDS.test(m.bodyPreview)) {
-      return true;
-    }
-  }
+  const allText = thread.messages
+    .map((m) => `${m.subject} ${m.bodyPreview}`)
+    .join(" ");
+
+  if (NON_DEAL_KEYWORDS.test(allText)) return false;
 
   const allSystem = thread.messages.every((m) => {
     const addr = m.from.emailAddress.address.toLowerCase();
@@ -70,8 +78,21 @@ function isDealEmail(thread: EmailThread): boolean {
       addr.endsWith("@accountprotection.microsoft.com")
     );
   });
+  if (allSystem) return false;
 
-  return !allSystem;
+  const domains = new Set(
+    thread.messages.map((m) =>
+      m.from.emailAddress.address.toLowerCase().split("@")[1],
+    ),
+  );
+  const hasSellerDomain = domains.has(SELLER_DOMAIN);
+  const hasExternalDomain = [...domains].some((d) => d !== SELLER_DOMAIN);
+  const isCrossDomain = hasSellerDomain && hasExternalDomain;
+
+  if (SOPHOS_PRODUCT_KEYWORDS.test(allText) && isCrossDomain) return true;
+  if (DEAL_STAGE_KEYWORDS.test(allText) && isCrossDomain) return true;
+
+  return false;
 }
 
 function DevMailboxHint() {
