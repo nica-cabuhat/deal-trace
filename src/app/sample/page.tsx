@@ -330,8 +330,23 @@ function SelectedThreadCard({ thread }: { thread: EmailThread }) {
   );
 }
 
+async function downloadPlaybook() {
+  const res = await fetch("/api/playbook");
+  if (!res.ok) throw new Error("Playbook generation failed");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "DealTrace_Rep_Playbook.pptx";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 export default function SamplePage() {
   const [showSampleDevHint, setShowSampleDevHint] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [urlMailboxConversationId, setUrlMailboxConversationId] = useState<
     string | null
   >(null);
@@ -561,10 +576,15 @@ export default function SamplePage() {
                 <div className="mt-3 flex flex-col gap-3">
                   <button
                     type="button"
-                    className="w-full rounded-md py-2.5 text-sm font-medium text-white"
+                    className="w-full rounded-md py-2.5 text-sm font-medium text-white disabled:opacity-60"
                     style={{ background: "var(--color-sophos-blue)" }}
+                    disabled={isDownloading}
+                    onClick={async () => {
+                      setIsDownloading(true);
+                      try { await downloadPlaybook(); } finally { setIsDownloading(false); }
+                    }}
                   >
-                    Download Rep Playbook
+                    {isDownloading ? "Generating…" : "Download Rep Playbook"}
                   </button>
                   <ThreadList
                     threads={cachedThreads}
@@ -701,10 +721,15 @@ export default function SamplePage() {
         </div>
         <button
           type="button"
-          className="w-full rounded-md py-2.5 text-sm font-medium text-white"
+          className="w-full rounded-md py-2.5 text-sm font-medium text-white disabled:opacity-60"
           style={{ background: "var(--color-sophos-blue)" }}
+          disabled={isDownloading}
+          onClick={async () => {
+            setIsDownloading(true);
+            try { await downloadPlaybook(); } finally { setIsDownloading(false); }
+          }}
         >
-          Download Rep Playbook
+          {isDownloading ? "Generating…" : "Download Rep Playbook"}
         </button>
         <ThreadList threads={cachedThreads} healthMap={cachedHealthMap} />
       </div>

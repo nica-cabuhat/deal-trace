@@ -392,8 +392,29 @@ function ThreadCard({
   onExpand,
   onSelect,
 }: ThreadCardProps) {
+  const [isDownloading, setIsDownloading] = useState(false);
   const previewText = thread.messages[0]?.bodyPreview;
   const gradientId = `rainbow-${thread.conversationId}`;
+
+  const handleDownloadCaseStudy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDownloading(true);
+    try {
+      const res = await fetch(`/api/casestudy?id=${encodeURIComponent(thread.conversationId)}`);
+      if (!res.ok) throw new Error("Case study generation failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.headers.get("content-disposition")?.match(/filename="([^"]+)"/)?.[1] ?? "CaseStudy.pptx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const cardBorder = isSelected
     ? "var(--color-sophos-blue)"
@@ -534,13 +555,15 @@ function ThreadCard({
             )}
             <button
               type="button"
-              className="mt-3 w-full rounded-md border py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
+              className="mt-3 w-full rounded-md border py-1.5 text-xs font-medium disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
               style={{
                 borderColor: "var(--color-sophos-blue)",
                 color: "var(--color-sophos-blue)",
               }}
+              disabled={isDownloading}
+              onClick={handleDownloadCaseStudy}
             >
-              Download Case Study
+              {isDownloading ? "Generating\u2026" : "Download Case Study"}
             </button>
           </div>
         </Content>
@@ -549,13 +572,15 @@ function ThreadCard({
           <div className="px-3 pb-3">
             <button
               type="button"
-              className="w-full rounded-md border py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
+              className="w-full rounded-md border py-1.5 text-xs font-medium disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
               style={{
                 borderColor: "var(--color-sophos-blue)",
                 color: "var(--color-sophos-blue)",
               }}
+              disabled={isDownloading}
+              onClick={handleDownloadCaseStudy}
             >
-              Download Case Study
+              {isDownloading ? "Generating\u2026" : "Download Case Study"}
             </button>
           </div>
         )}
