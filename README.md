@@ -56,14 +56,14 @@ It also draws on a library of historical won/lost/stalled deal patterns extracte
 ![outlook add-in](public/screenshot/screenshot-1.png)
 ![deal score UI](public/screenshot/screenshot-2.png)
 ![all deals UI](public/screenshot/screenshot-3.png)
-![deal score UI](public/screenshot/screenshot-4.png)
-![deal score UI](public/screenshot/screenshot-5.png)
-![deal score UI](public/screenshot/screenshot-6.png)
-![deal score UI](public/screenshot/screenshot-7.png)
+![playbook pptx](public/screenshot/screenshot-4.png)
+![case study pptx](public/screenshot/screenshot-5.png)
+![case study pptx](public/screenshot/screenshot-6.png)
+![all panels](public/screenshot/screenshot-7.png)
 
 ## What I Learned
 
-At the start, I had no clear direction. So I did what I know how to do, I audited myself. I asked what I'm actually good at, what I build every day, and who I build it for. The answer was straightforward. I've been building utility tools for Sales Engineers. Outlook is the one application we both use. So that's where I focused, build something meaningful for a tool SEs already use, rather than chasing something impressive I didn't understand yet.
+At the start, I had no clear direction. So I did what I know how to do, I audited myself. I asked what I'm actually good at, what I build every day, and who I build it for. The answer was straightforward. I've been building utility tools for Sales Engineers. Outlook is the one application we both use. So that's where I focused on, build something meaningful for a tool SEs already use, rather than chasing something impressive I didn't understand yet.
 
 What I didn't expect was the confidence that came with it. I would never have attempted to build an Outlook add-in before this challenge. The idea alone would have stopped me. But once I started, broke it down, and got it working, something shifted. The number of things I now believe I can build has genuinely expanded.
 I was also deliberate about how I used AI throughout. Working with limited tokens forced me to plan before I prompted. I thought through my workflow first, identified exactly what I needed help with, and used AI as a precision tool rather than a crutch. That discipline made the whole process sharper.
@@ -72,17 +72,9 @@ This challenge didn't just produce a project. It changed what I think is possibl
 
 ## Value Created
 
-**For Sales Engineers:** DealTrace removes the cognitive load of manually interpreting long email threads. Instead of re-reading 20 messages to decide what to do next, a rep gets an instant, structured view of deal health, scored, explained, and actionable, without leaving Outlook.
+**For Sales Engineers:** Every deal adds to a personal knowledge base they never had to manually build. Over time, DealTrace surfaces strategies and habits the SE was already running but never had visibility into. Skill compounds because history compounds. The more deals, the sharper the pattern. The sharper the pattern, the better the next deal. And when a deal is active, the health score is not just a diagnostic. It is an asset. A scored, explained read on where the deal stands gives the SE the confidence and clarity to act at exactly the right moment.
 
-**For the team:** Consistent, signal-based deal assessment across the SE org. Early warning on deals sliding toward stalled or lost, so managers and SEs can intervene before it's too late.
-
-**For customers:** Faster, more informed follow-ups. When reps know exactly what the prospect cares about and where the friction is, outreach is more relevant and less noise.
-
-## Does It Solve a Real Customer Problem?
-
-Yes, indirectly. The tool improves the quality and speed of SE follow-up, which directly impacts the customer's buying experience. Prospects receive better-timed, more targeted responses because the rep has clearer signal on where the conversation stands.
-
-It also improves internal motion: deal reviews, pipeline calls, and forecast accuracy all benefit from consistent, AI-grounded health signals rather than subjective rep intuition.
+**For customers:** Every touchpoint from an SE using DealTrace is grounded in what the thread actually said. No retreading covered ground, no generic follow-ups, no outreach that arrives at the wrong moment. The prospect gets an SE who already knows where the conversation stands and responds to exactly that, nothing more, nothing less.
 
 ## Tools Used
 
@@ -121,7 +113,24 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) - the taskpane loads at `/taskpane`.
 
-To run as an Outlook add-in, run `./public/gen-manifest.sh https://deal-trace-gse.vercel.app/` then sideload `manifest-dev.xml` from public folder into Outlook via the Office add-in sideloading flow.
+## Open Add-in on Outlook
+
+Run on project root directory
+
+```bash
+./public/gen-manifest.sh https://deal-trace-gse.vercel.app/`
+```
+
+Open Enhance Outlook with apps
+![enhance outlook](public/screenshot/screenshot-12.png)
+
+Add a custom add-in
+![custom addin](public/screenshot/screenshot-13.png)
+
+Select `manifest.xml` from public folder
+![manifest](public/screenshot/screenshot-14.png)
+
+![addin](screenshot-15.png)
 
 ### Environment Variables
 
