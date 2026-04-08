@@ -166,6 +166,11 @@ export default function Home() {
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center justify-between gap-2">
+            <img
+              src="/icon-32.png"
+              alt="DealTrace"
+              className="h-6 w-6 rounded"
+            />
             <span
               className="text-lg font-bold tracking-tight"
               style={{ color: "var(--color-gray-900)" }}
@@ -342,8 +347,8 @@ export default function Home() {
                         <Image
                           src={SHOWCASE_IMAGES[item.id].src}
                           alt={SHOWCASE_IMAGES[item.id].alt}
-                          width={600}
-                          height={400}
+                          width={500}
+                          height={720}
                           className="w-full rounded-xl border shadow-sm"
                           style={{ borderColor: "var(--color-gray-150)" }}
                         />
@@ -356,7 +361,7 @@ export default function Home() {
 
             {/* Right — sticky illustration */}
             <div className="hidden md:block">
-              <div className="sticky top-32">
+              <div className="sticky top-22">
                 <div
                   className="overflow-hidden rounded-2xl border shadow-lg transition-all duration-500 w-full"
                   style={{ borderColor: "var(--color-gray-150)" }}
@@ -365,11 +370,11 @@ export default function Home() {
                     <Image
                       src={activeImage.src}
                       alt={activeImage.alt}
-                      width={600}
-                      height={900}
+                      width={500}
+                      height={720}
                       className="block w-full h-auto"
                       priority
-                      sizes="(min-width: 768px) 50vw, 100vw"
+                      sizes="(min-width: 500px) 40vw, 80vw"
                     />
                   )}
                 </div>
@@ -466,12 +471,11 @@ export default function Home() {
       >
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
           <div className="flex items-center gap-2">
-            <div
-              className="flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold text-white"
-              style={{ background: "var(--color-sophos-blue)" }}
-            >
-              DT
-            </div>
+            <img
+              src="/icon-32.png"
+              alt="DealTrace"
+              className="h-6 w-6 rounded"
+            />
             <span
               className="text-sm font-semibold"
               style={{ color: "var(--color-gray-700)" }}

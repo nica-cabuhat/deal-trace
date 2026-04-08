@@ -42,7 +42,9 @@ const patternStats: PatternStats = {
   total: caseStudies.length,
   won: caseStudies.filter((cs) => cs.health.outcome === "won").length,
   lost: caseStudies.filter((cs) => cs.health.outcome === "lost").length,
-  stalled: caseStudies.filter((cs) => cs.health.outcome !== "won" && cs.health.outcome !== "lost").length,
+  stalled: caseStudies.filter(
+    (cs) => cs.health.outcome !== "won" && cs.health.outcome !== "lost",
+  ).length,
 };
 
 /** Strip Exchange legacy DN paths from sender display names. */
@@ -117,73 +119,6 @@ function DevMailboxHint() {
   );
 }
 
-function AppHeader() {
-  return (
-    <header
-      className="flex items-center justify-between border-b px-4 py-3"
-      style={{ borderColor: "var(--color-gray-200)", background: "white" }}
-    >
-      <div className="flex items-center gap-2">
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.5C16.5 22.15 20 17.25 20 12V6L12 2z"
-            fill="var(--color-sophos-blue)"
-          />
-          <path
-            d="M9 12l2 2 4-4"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <span
-          className="text-sm font-bold"
-          style={{ color: "var(--color-sophos-blue)" }}
-        >
-          DealTrace
-        </span>
-      </div>
-      <button
-        type="button"
-        onClick={() => {
-          try {
-            Office?.context?.ui?.closeContainer?.();
-          } catch {
-            window.location.href = window.location.pathname;
-          }
-        }}
-        className="rounded p-1.5 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
-        aria-label="Close and reopen for current email"
-        title="Close — reopen from ribbon to sync"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--color-gray-500)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M21 2v6h-6" />
-          <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-          <path d="M3 22v-6h6" />
-          <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-        </svg>
-      </button>
-    </header>
-  );
-}
-
 function MessageRow({ message }: { message: EmailMessage }) {
   const dt = new Date(message.receivedDateTime);
   const datePart = dt.toLocaleDateString(undefined, {
@@ -215,7 +150,10 @@ function MessageRow({ message }: { message: EmailMessage }) {
             </span>
           )}
         </p>
-        <p className="shrink-0 text-right text-xs" style={{ color: "var(--color-gray-450)" }}>
+        <p
+          className="shrink-0 text-right text-xs"
+          style={{ color: "var(--color-gray-450)" }}
+        >
           <span>{datePart}</span>
           <br />
           <span>{timePart}</span>
@@ -510,7 +448,6 @@ export default function SamplePage() {
           className="flex min-h-screen flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
-          <AppHeader />
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
             <div
               className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -536,7 +473,6 @@ export default function SamplePage() {
           className="flex min-h-screen flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
-          <AppHeader />
           {showSampleDevHint && <DevMailboxHint />}
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
             <h2
@@ -583,7 +519,11 @@ export default function SamplePage() {
                     disabled={isDownloading}
                     onClick={async () => {
                       setIsDownloading(true);
-                      try { await downloadPlaybook(); } finally { setIsDownloading(false); }
+                      try {
+                        await downloadPlaybook();
+                      } finally {
+                        setIsDownloading(false);
+                      }
                     }}
                   >
                     {isDownloading ? "Generating…" : "Download Rep Playbook"}
@@ -606,7 +546,6 @@ export default function SamplePage() {
         className="flex min-h-screen flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <AppHeader />
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -630,7 +569,6 @@ export default function SamplePage() {
         className="flex min-h-screen flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <AppHeader />
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -653,7 +591,6 @@ export default function SamplePage() {
         className="flex min-h-screen flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <AppHeader />
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <svg
             width="40"
@@ -704,7 +641,6 @@ export default function SamplePage() {
       className="flex min-h-screen flex-col"
       style={{ background: "var(--color-gray-50)" }}
     >
-      <AppHeader />
       {showSampleDevHint && <DevMailboxHint />}
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
         <div>
@@ -728,7 +664,11 @@ export default function SamplePage() {
           disabled={isDownloading}
           onClick={async () => {
             setIsDownloading(true);
-            try { await downloadPlaybook(); } finally { setIsDownloading(false); }
+            try {
+              await downloadPlaybook();
+            } finally {
+              setIsDownloading(false);
+            }
           }}
         >
           {isDownloading ? "Generating…" : "Download Rep Playbook"}
