@@ -39,9 +39,8 @@ export async function GET(req: NextRequest) {
   const subject = req.nextUrl.searchParams.get("subject");
 
   if (!session?.accessToken || session.error === "RefreshTokenError") {
-    if (process.env.NODE_ENV === "development") {
-      return serveMockThread(conversationId, subject);
-    }
+    const mock = serveMockThread(conversationId, subject);
+    if (mock) return mock;
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -158,7 +157,7 @@ export async function GET(req: NextRequest) {
 function serveMockThread(
   conversationId: string | null,
   subject: string | null,
-) {
+): NextResponse | null {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const caseStudies = require("@/lib/data/case-studies.json") as Array<{
     conversationId: string;
@@ -177,15 +176,10 @@ function serveMockThread(
     return false;
   });
 
-  if (!match) {
-    return NextResponse.json(
-      { error: "No mock thread found for this query" },
-      { status: 404 },
-    );
-  }
+  if (!match) return null;
 
   console.log(
-    `[graph/conversation] DEV MOCK: "${match.subject}" — ${match.messages.length} messages`,
+    `[graph/conversation] MOCK: "${match.subject}" — ${match.messages.length} messages`,
   );
 
   return NextResponse.json({

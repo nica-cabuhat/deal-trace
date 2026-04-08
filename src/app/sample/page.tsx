@@ -524,9 +524,122 @@ function SamplePageInner() {
     [scoreThread],
   );
 
+  // ── Demo mode: match cached case study by subject, skip conversation API ───
+  const demoThread = urlMailboxSubject
+    ? cachedThreads.find((t) =>
+        t.subject.toLowerCase().includes(urlMailboxSubject.toLowerCase()),
+      )
+    : null;
+
+  const [demoHealth, setDemoHealth] = useState<ThreadHealth | undefined>(
+    undefined,
+  );
+  const [demoDraftLoading, setDemoDraftLoading] = useState(false);
+  const [demoProjectedScore, setDemoProjectedScore] = useState<
+    number | undefined
+  >();
+
+  useEffect(() => {
+    if (demoThread) {
+      setDemoHealth(cachedHealthMap[demoThread.conversationId]);
+    }
+  }, [demoThread]);
+
+  const handleDemoDraft = useCallback(
+    async (thread: EmailThread) => {
+      setDemoDraftLoading(true);
+      try {
+        const result = await scoreThread({ thread, includeDraft: true });
+        setDemoHealth((prev) => {
+          const base = prev ?? result;
+          const boost =
+            base.healthScore >= 80 ? 5 : base.healthScore >= 50 ? 10 : 15;
+          setDemoProjectedScore(Math.min(98, base.healthScore + boost));
+          return { ...base, draftEmail: result.draftEmail };
+        });
+      } finally {
+        setDemoDraftLoading(false);
+      }
+    },
+    [scoreThread],
+  );
+
+  if (demoThread) {
+    return (
+      <div
+        className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
+        style={{ background: "var(--color-gray-50)" }}
+      >
+        <SampleNavbar threadSubject={demoThread.subject} />
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+          <h2
+            className="text-sm font-semibold"
+            style={{ color: "var(--color-gray-600)" }}
+          >
+            Selected Deal Thread
+          </h2>
+
+          <SelectedThreadCard thread={demoThread} />
+
+          <ThreadScore
+            health={demoHealth}
+            isLoading={false}
+            onRequestDraft={() => void handleDemoDraft(demoThread)}
+            isDraftLoading={demoDraftLoading}
+            projectedScore={demoProjectedScore}
+            isProjecting={false}
+          />
+
+          <section aria-label="All deal threads">
+            <button
+              type="button"
+              className="w-full rounded-md border py-2 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-sophos-blue)"
+              style={{
+                borderColor: "var(--color-gray-300)",
+                color: "var(--color-gray-600)",
+                background: "white",
+              }}
+              onClick={() => setIsAllThreadsOpen((v) => !v)}
+              aria-expanded={isAllThreadsOpen}
+            >
+              {isAllThreadsOpen ? "Hide Deal Threads" : "Show All Deal Threads"}
+            </button>
+
+            {isAllThreadsOpen && (
+              <div className="mt-3 flex flex-col gap-3">
+                <button
+                  type="button"
+                  className="w-full rounded-md py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                  style={{ background: "var(--color-sophos-blue)" }}
+                  disabled={isDownloading}
+                  onClick={async () => {
+                    setIsDownloading(true);
+                    try {
+                      await downloadPlaybook();
+                    } finally {
+                      setIsDownloading(false);
+                    }
+                  }}
+                >
+                  {isDownloading ? "Generating…" : "Download Rep Playbook"}
+                </button>
+                <ThreadList
+                  threads={cachedThreads}
+                  healthMap={cachedHealthMap}
+                />
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   // ── Determine which state to render ─────────────────────────────────────────
   const showStateB =
-    hasMailboxContext && selectedIsDeal === true && !isUnauthorized;
+    hasMailboxContext &&
+    (selectedIsDeal === true || showSampleDevHint) &&
+    !isUnauthorized;
 
   // ── STATE B: active deal thread selected ──────────────────────────────────
   if (showStateB) {
@@ -681,7 +794,7 @@ function SamplePageInner() {
     );
   }
 
-  if (hasMailboxContext && isUnauthorized) {
+  if (hasMailboxContext && isUnauthorized && !showSampleDevHint) {
     return (
       <div
         className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
