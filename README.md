@@ -130,7 +130,7 @@ Add a custom add-in
 Select `manifest.xml` from public folder
 ![manifest](public/screenshot/screenshot-14.png)
 
-![addin](screenshot-15.png)
+![addin](public/screenshot/screenshot-15.png)
 
 ### Environment Variables
 
