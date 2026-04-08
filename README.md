@@ -12,11 +12,13 @@
 
 ## The Problem
 
-Sales Engineers win and lose deals in patterns. The same objection handled too late. The same competitor mention left unaddressed. The same thread going quiet at the same stage. But because those patterns are buried across hundreds of email threads, they're never visible until after the damage is done.
+Every deal is different. Different prospect, different timing, different competitive pressure. But the one constant across every deal an SE has ever worked is the SE themselves.
 
-There's no way to look at a live deal and know that it's following the same trajectory as the last five that slipped. No way to know which habits separate your best deals from your worst ones. No way to learn from history when history is just a pile of unstructured email.
+And with every deal, a pattern has been building. How they respond when a competitor gets mentioned. How long they wait before following up. Whether they push for next steps or let the thread breathe. These micro-behaviors repeat across hundreds of threads, quietly accumulating into habits that either close deals or cost them.
+But patterns are only useful when they are visible. Research shows that humans have a bias blind spot. We see patterns all around us, but rarely in ourselves. [[Sage Journals]](https://journals.sagepub.com/doi/10.1177/09637214231178745) An SE can work a hundred deals and never clearly see which of their own habits are driving wins and which ones are quietly working against them. The signal is there, buried across every thread they have ever sent, but there is no structure to surface it.
 
-So the same losing patterns repeat. The winning ones stay locked inside individual SEs who can't explain exactly why certain deals close. And every new deal starts from scratch, with no signal from everything that came before it.
+Won deals and lost deals sit in the same inbox, never compared. The habits behind a breakthrough quarter go unexamined. The early divergence between a deal that closed and one that did not stays invisible until after it matters.
+The pattern exists. It has always existed. It just has nowhere to live.
 
 ## How AI Was Used
 

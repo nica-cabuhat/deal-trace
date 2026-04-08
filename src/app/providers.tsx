@@ -34,7 +34,6 @@ function SafeReactQueryDevtools() {
   }, []);
 
   if (!show) return null;
-  return <ReactQueryDevtools initialIsOpen={false} />;
 }
 
 export default function Providers({ children }: { children: React.ReactNode }) {
