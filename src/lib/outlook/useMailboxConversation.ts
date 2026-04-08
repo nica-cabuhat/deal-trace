@@ -25,6 +25,7 @@ export function useMailboxConversation(
 ): {
   conversationId: string | null;
   itemSubject: string | null;
+  userEmail: string | null;
   isOfficeReady: boolean;
 } {
   const onConversationChangedRef = useRef(options?.onConversationChanged);
@@ -37,6 +38,7 @@ export function useMailboxConversation(
 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [itemSubject, setItemSubject] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isOfficeReady, setIsOfficeReady] = useState(false);
 
   const readAndUpdate = useCallback(
@@ -112,6 +114,12 @@ export function useMailboxConversation(
     const afterOfficeReady = () => {
       scheduleAfterMount(isMounted, () => {
         setIsOfficeReady(true);
+        try {
+          const email = Office.context.mailbox?.userProfile?.emailAddress;
+          if (email) setUserEmail(email.toLowerCase());
+        } catch {
+          /* userProfile may not be available in all hosts */
+        }
         readAndUpdate(false);
         attachMailboxHandlers();
         startItemPolling();
@@ -159,5 +167,5 @@ export function useMailboxConversation(
     };
   }, [readAndUpdate]);
 
-  return { conversationId, itemSubject, isOfficeReady };
+  return { conversationId, itemSubject, userEmail, isOfficeReady };
 }
