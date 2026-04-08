@@ -90,12 +90,14 @@ function isDealEmail(thread: EmailThread): boolean {
       (m) => m.from.emailAddress.address.toLowerCase().split("@")[1],
     ),
   );
-  const hasSellerDomain = domains.has(SELLER_DOMAIN);
-  const hasExternalDomain = [...domains].some((d) => d !== SELLER_DOMAIN);
-  const isCrossDomain = hasSellerDomain && hasExternalDomain;
+  // Only require an external domain — the logged-in user is always the Sophos SE,
+  // so their sent messages don't need to appear in the fetched thread for this to be a deal.
+  const hasExternalDomain = [...domains].some(
+    (d) => d && d !== SELLER_DOMAIN && !d.endsWith("microsoft.com"),
+  );
 
-  if (SOPHOS_PRODUCT_KEYWORDS.test(allText) && isCrossDomain) return true;
-  if (DEAL_STAGE_KEYWORDS.test(allText) && isCrossDomain) return true;
+  if (SOPHOS_PRODUCT_KEYWORDS.test(allText) && hasExternalDomain) return true;
+  if (DEAL_STAGE_KEYWORDS.test(allText) && hasExternalDomain) return true;
 
   return false;
 }
