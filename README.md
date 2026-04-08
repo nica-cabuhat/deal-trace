@@ -115,6 +115,12 @@ Open [http://localhost:3000](http://localhost:3000) - the taskpane loads at `/ta
 
 ## Open Add-in on Outlook
 
+Run on project root directory
+
+```bash
+./public/gen-manifest.sh https://deal-trace-gse.vercel.app/`
+```
+
 Open Enhance Outlook with apps
 ![enhance outlook](public/screenshot/screenshot-12.png)
 
