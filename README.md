@@ -51,6 +51,14 @@ It reads the full email thread via Microsoft Graph, then uses an LLM to:
 
 It also draws on a library of historical won/lost/stalled deal patterns extracted from our own email threads and case studies. This grounds the scoring in real outcomes, so the model isn't analyzing the current thread in isolation but comparing it against what winning and losing actually looked like.
 
+![outlook add-in](public/screenshot/screenshot-1.png)
+![deal score UI](public/screenshot/screenshot-2.png)
+![all deals UI](public/screenshot/screenshot-3.png)
+![deal score UI](public/screenshot/screenshot-4.png)
+![deal score UI](public/screenshot/screenshot-5.png)
+![deal score UI](public/screenshot/screenshot-6.png)
+![deal score UI](public/screenshot/screenshot-7.png)
+
 ## What I Learned
 
 At the start, I had no clear direction. So I did what I know how to do, I audited myself. I asked what I'm actually good at, what I build every day, and who I build it for. The answer was straightforward. I've been building utility tools for Sales Engineers. Outlook is the one application we both use. So that's where I focused, build something meaningful for a tool SEs already use, rather than chasing something impressive I didn't understand yet.
