@@ -1,8 +1,6 @@
 "use client";
 
-import { Suspense, useState, useCallback, useEffect, useRef } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Content, Root, Trigger } from "@radix-ui/react-collapsible";
 import caseStudiesData from "@/lib/data/case-studies.json";
 import type { EmailMessage, EmailThread } from "@/lib/types/thread";
@@ -323,7 +321,7 @@ function SampleNavbar({
       }}
     >
       <nav className="flex h-12 items-center gap-3 px-4">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        <a href="/" className="flex shrink-0 items-center gap-2">
           <img
             src="/icon-32.png"
             alt="DealTrace"
@@ -335,18 +333,18 @@ function SampleNavbar({
           >
             DealTrace
           </span>
-        </Link>
+        </a>
 
         {threadSubject ? (
           <>
             <NavChevron />
-            <Link
+            <a
               href="/sample"
               className="shrink-0 text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: "var(--color-gray-500)" }}
             >
               All Threads
-            </Link>
+            </a>
             <NavChevron />
             <span
               className="truncate text-sm font-medium"
@@ -358,13 +356,13 @@ function SampleNavbar({
         ) : (
           <>
             <NavChevron />
-            <Link
+            <a
               href={SAMPLE_THREAD_HREF}
               className="shrink-0 text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: "var(--color-gray-500)" }}
             >
               Sample Deal Thread
-            </Link>
+            </a>
           </>
         )}
       </nav>
@@ -373,20 +371,14 @@ function SampleNavbar({
 }
 
 export default function SamplePage() {
-  return (
-    <Suspense>
-      <SamplePageInner />
-    </Suspense>
-  );
-}
-
-function SamplePageInner() {
   const [showSampleDevHint, setShowSampleDevHint] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const searchParams = useSearchParams();
-  const urlMailboxConversationId =
-    searchParams.get("conv") ?? searchParams.get("mailboxConversation");
-  const urlMailboxSubject = searchParams.get("subject");
+  const [urlMailboxConversationId, setUrlMailboxConversationId] = useState<
+    string | null
+  >(null);
+  const [urlMailboxSubject, setUrlMailboxSubject] = useState<string | null>(
+    null,
+  );
 
   // ── State B: live thread from real Outlook conversation ────────────────────
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
@@ -406,6 +398,10 @@ function SamplePageInner() {
   useEffect(() => {
     const path = window.location.pathname;
     setShowSampleDevHint(path === "/sample" || path.endsWith("/sample"));
+
+    const p = new URLSearchParams(window.location.search);
+    setUrlMailboxConversationId(p.get("conv") ?? p.get("mailboxConversation"));
+    setUrlMailboxSubject(p.get("subject"));
   }, []);
 
   const { conversationId: officeConversationId, itemSubject: officeSubject } =
@@ -570,7 +566,7 @@ function SamplePageInner() {
         className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <SampleNavbar threadSubject={demoThread.subject} />
+        {showSampleDevHint && <SampleNavbar threadSubject={demoThread.subject} />}
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
           <h2
             className="text-sm font-semibold"
@@ -649,9 +645,11 @@ function SamplePageInner() {
           className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
-          <SampleNavbar
-            threadSubject={mailboxSubject ?? fetchedThread?.subject}
-          />
+          {showSampleDevHint && (
+            <SampleNavbar
+              threadSubject={mailboxSubject ?? fetchedThread?.subject}
+            />
+          )}
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
             <div
               className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -677,7 +675,7 @@ function SamplePageInner() {
           className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
-          <SampleNavbar threadSubject={t.subject} />
+          {showSampleDevHint && <SampleNavbar threadSubject={t.subject} />}
           {showSampleDevHint && <DevMailboxHint />}
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
             <h2
@@ -751,9 +749,11 @@ function SamplePageInner() {
         className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <SampleNavbar
-          threadSubject={mailboxSubject ?? fetchedThread?.subject}
-        />
+        {showSampleDevHint && (
+          <SampleNavbar
+            threadSubject={mailboxSubject ?? fetchedThread?.subject}
+          />
+        )}
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -777,7 +777,7 @@ function SamplePageInner() {
         className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <SampleNavbar />
+        {showSampleDevHint && <SampleNavbar />}
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -800,7 +800,7 @@ function SamplePageInner() {
         className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
-        <SampleNavbar />
+        {showSampleDevHint && <SampleNavbar />}
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <svg
             width="40"
@@ -851,7 +851,7 @@ function SamplePageInner() {
       className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
       style={{ background: "var(--color-gray-50)" }}
     >
-      <SampleNavbar />
+      {showSampleDevHint && <SampleNavbar />}
       {showSampleDevHint && <DevMailboxHint />}
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
         <div>
