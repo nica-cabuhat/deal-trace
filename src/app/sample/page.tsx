@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { Suspense, useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Content, Root, Trigger } from "@radix-ui/react-collapsible";
@@ -373,6 +373,14 @@ function SampleNavbar({
 }
 
 export default function SamplePage() {
+  return (
+    <Suspense>
+      <SamplePageInner />
+    </Suspense>
+  );
+}
+
+function SamplePageInner() {
   const [showSampleDevHint, setShowSampleDevHint] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const searchParams = useSearchParams();
