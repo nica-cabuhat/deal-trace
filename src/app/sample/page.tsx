@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Content, Root, Trigger } from "@radix-ui/react-collapsible";
 import caseStudiesData from "@/lib/data/case-studies.json";
 import type { EmailMessage, EmailThread } from "@/lib/types/thread";
@@ -284,15 +286,99 @@ async function downloadPlaybook() {
   URL.revokeObjectURL(url);
 }
 
+const SAMPLE_THREAD_HREF =
+  "/sample?subject=End+of+life+firewall+risk+in+retail";
+
+function NavChevron() {
+  return (
+    <svg
+      className="h-4 w-4 shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      style={{ color: "var(--color-gray-300)" }}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 5l7 7-7 7"
+      />
+    </svg>
+  );
+}
+
+function SampleNavbar({
+  threadSubject,
+}: {
+  threadSubject?: string;
+}) {
+  return (
+    <header
+      className="sticky top-0 z-50 border-b backdrop-blur-md"
+      style={{
+        borderColor: "var(--color-gray-150)",
+        background: "rgba(255,255,255,0.85)",
+      }}
+    >
+      <nav className="flex h-12 items-center gap-3 px-4">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <img
+            src="/icon-32.png"
+            alt="DealTrace"
+            className="h-5 w-5 rounded"
+          />
+          <span
+            className="text-sm font-bold tracking-tight"
+            style={{ color: "var(--color-gray-900)" }}
+          >
+            DealTrace
+          </span>
+        </Link>
+
+        {threadSubject ? (
+          <>
+            <NavChevron />
+            <Link
+              href="/sample"
+              className="shrink-0 text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: "var(--color-gray-500)" }}
+            >
+              All Threads
+            </Link>
+            <NavChevron />
+            <span
+              className="truncate text-sm font-medium"
+              style={{ color: "var(--color-gray-600)" }}
+            >
+              {threadSubject}
+            </span>
+          </>
+        ) : (
+          <>
+            <NavChevron />
+            <Link
+              href={SAMPLE_THREAD_HREF}
+              className="shrink-0 text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: "var(--color-gray-500)" }}
+            >
+              Sample Deal Thread
+            </Link>
+          </>
+        )}
+      </nav>
+    </header>
+  );
+}
+
 export default function SamplePage() {
   const [showSampleDevHint, setShowSampleDevHint] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [urlMailboxConversationId, setUrlMailboxConversationId] = useState<
-    string | null
-  >(null);
-  const [urlMailboxSubject, setUrlMailboxSubject] = useState<string | null>(
-    null,
-  );
+  const searchParams = useSearchParams();
+  const urlMailboxConversationId =
+    searchParams.get("conv") ?? searchParams.get("mailboxConversation");
+  const urlMailboxSubject = searchParams.get("subject");
 
   // ── State B: live thread from real Outlook conversation ────────────────────
   const [liveThread, setLiveThread] = useState<EmailThread | null>(null);
@@ -325,12 +411,6 @@ export default function SamplePage() {
         lastLiveConvId.current = null;
       },
     });
-
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    setUrlMailboxConversationId(p.get("conv") ?? p.get("mailboxConversation"));
-    setUrlMailboxSubject(p.get("subject"));
-  }, []);
 
   const mailboxConversationId =
     officeConversationId ?? urlMailboxConversationId;
@@ -445,9 +525,12 @@ export default function SamplePage() {
     if (isLoadingConversation || isLiveAnalyzing) {
       return (
         <div
-          className="flex min-h-screen flex-col"
+          className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
+          <SampleNavbar
+            threadSubject={mailboxSubject ?? fetchedThread?.subject}
+          />
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
             <div
               className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -470,9 +553,10 @@ export default function SamplePage() {
       const t = liveThread;
       return (
         <div
-          className="flex min-h-screen flex-col"
+          className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
           style={{ background: "var(--color-gray-50)" }}
         >
+          <SampleNavbar threadSubject={t.subject} />
           {showSampleDevHint && <DevMailboxHint />}
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
             <h2
@@ -543,9 +627,12 @@ export default function SamplePage() {
     // Deal detected but analysis hasn't started yet — show spinner
     return (
       <div
-        className="flex min-h-screen flex-col"
+        className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
+        <SampleNavbar
+          threadSubject={mailboxSubject ?? fetchedThread?.subject}
+        />
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -566,9 +653,10 @@ export default function SamplePage() {
   if (hasMailboxContext && isLoadingConversation) {
     return (
       <div
-        className="flex min-h-screen flex-col"
+        className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
+        <SampleNavbar />
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <div
             className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
@@ -588,9 +676,10 @@ export default function SamplePage() {
   if (hasMailboxContext && isUnauthorized) {
     return (
       <div
-        className="flex min-h-screen flex-col"
+        className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
         style={{ background: "var(--color-gray-50)" }}
       >
+        <SampleNavbar />
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <svg
             width="40"
@@ -638,9 +727,10 @@ export default function SamplePage() {
   // ── STATE A: no active deal context — show static playbook ─────────────────
   return (
     <div
-      className="flex min-h-screen flex-col"
+      className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col"
       style={{ background: "var(--color-gray-50)" }}
     >
+      <SampleNavbar />
       {showSampleDevHint && <DevMailboxHint />}
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
         <div>
