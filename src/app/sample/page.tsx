@@ -356,6 +356,13 @@ function SampleNavbar({
         ) : (
           <>
             <NavChevron />
+            <span
+              className="shrink-0 text-sm font-medium"
+              style={{ color: "var(--color-gray-600)" }}
+            >
+              All Threads
+            </span>
+            <NavChevron />
             <a
               href={SAMPLE_THREAD_HREF}
               className="shrink-0 text-sm font-medium transition-colors hover:opacity-80"
