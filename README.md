@@ -12,11 +12,11 @@
 
 ## The Problem
 
-Sales Engineers spend significant time manually reading through long email threads to assess where a deal stands. Is the prospect engaged? Have they raised objections? Did they mention a competitor? Is this deal stalling or progressing?
+Sales Engineers win and lose deals in patterns. The same objection handled too late. The same competitor mention left unaddressed. The same thread going quiet at the same stage. But because those patterns are buried across hundreds of email threads, they're never visible until after the damage is done.
 
-There's no structured signal from raw email. SEs have to hold the full thread in their head, synthesize tone and intent across multiple parties, and make a gut-call on next steps. This is slow, inconsistent, and easy to get wrong, especially across a large pipeline with many active threads.
+There's no way to look at a live deal and know that it's following the same trajectory as the last five that slipped. No way to know which habits separate your best deals from your worst ones. No way to learn from history when history is just a pile of unstructured email.
 
-The result: deals stall without clear intervention, follow-ups aren't prioritized correctly, and reps miss early warning signs that a deal is slipping.
+So the same losing patterns repeat. The winning ones stay locked inside individual SEs who can't explain exactly why certain deals close. And every new deal starts from scratch, with no signal from everything that came before it.
 
 ## How AI Was Used
 
