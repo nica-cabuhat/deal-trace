@@ -56,7 +56,7 @@ function isEmail(addr: string): boolean {
   return addr.includes("@");
 }
 
-const SELLER_DOMAIN = "sophos.com";
+const DEFAULT_SELLER_DOMAIN = "sophos.com";
 
 const SOPHOS_PRODUCT_KEYWORDS =
   /\b(sophos|intercept\s*x|mdr|xdr|firewall|central|endpoint|ztna|cyber\s*security|threat\s*protect|ransomware\s*protect|proof\s*of\s*concept|poc)\b/i;
@@ -70,7 +70,7 @@ const NON_DEAL_KEYWORDS =
 const SYSTEM_SENDERS =
   /\b(noreply|no-reply|account-security|mailer-daemon|postmaster|notifications?|support@|billing@|newsletter|hr@|human\.?resources|admin@|helpdesk)\b/i;
 
-function isDealEmail(thread: EmailThread): boolean {
+function isDealEmail(thread: EmailThread, sellerDomain: string): boolean {
   const allText = thread.messages
     .map((m) => `${m.subject} ${m.bodyPreview}`)
     .join(" ");
@@ -92,10 +92,8 @@ function isDealEmail(thread: EmailThread): boolean {
       (m) => m.from.emailAddress.address.toLowerCase().split("@")[1],
     ),
   );
-  // Only require an external domain — the logged-in user is always the Sophos SE,
-  // so their sent messages don't need to appear in the fetched thread for this to be a deal.
   const hasExternalDomain = [...domains].some(
-    (d) => d && d !== SELLER_DOMAIN && !d.endsWith("microsoft.com"),
+    (d) => d && d !== sellerDomain && !d.endsWith("microsoft.com"),
   );
 
   if (SOPHOS_PRODUCT_KEYWORDS.test(allText) && hasExternalDomain) return true;
@@ -173,7 +171,13 @@ function MessageRow({ message }: { message: EmailMessage }) {
   );
 }
 
-function SelectedThreadCard({ thread }: { thread: EmailThread }) {
+function SelectedThreadCard({
+  thread,
+  sellerDomain,
+}: {
+  thread: EmailThread;
+  sellerDomain: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -218,7 +222,7 @@ function SelectedThreadCard({ thread }: { thread: EmailThread }) {
               (m) =>
                 !m.from.emailAddress.address
                   .toLowerCase()
-                  .includes(SELLER_DOMAIN),
+                  .includes(sellerDomain),
             );
             const contactName = contact
               ? cleanName(contact.from.emailAddress.name)
@@ -411,17 +415,24 @@ export default function SamplePage() {
     setUrlMailboxSubject(p.get("subject"));
   }, []);
 
-  const { conversationId: officeConversationId, itemSubject: officeSubject } =
-    useMailboxConversation({
-      onConversationChanged: () => {
-        setLiveThread(null);
-        setLiveHealth(null);
-        setLiveProjectedScore(undefined);
-        setIsLiveAnalyzing(false);
-        setIsLiveScoring(false);
-        lastLiveConvId.current = null;
-      },
-    });
+  const {
+    conversationId: officeConversationId,
+    itemSubject: officeSubject,
+    userEmail,
+  } = useMailboxConversation({
+    onConversationChanged: () => {
+      setLiveThread(null);
+      setLiveHealth(null);
+      setLiveProjectedScore(undefined);
+      setIsLiveAnalyzing(false);
+      setIsLiveScoring(false);
+      lastLiveConvId.current = null;
+    },
+  });
+
+  const sellerDomain = userEmail
+    ? userEmail.split("@")[1]
+    : DEFAULT_SELLER_DOMAIN;
 
   const mailboxConversationId =
     officeConversationId ?? urlMailboxConversationId;
@@ -439,7 +450,9 @@ export default function SamplePage() {
   const isUnauthorized = conversationResult?.isUnauthorized ?? false;
 
   // Derived synchronously — no effect needed for deal detection
-  const selectedIsDeal = fetchedThread ? isDealEmail(fetchedThread) : null;
+  const selectedIsDeal = fetchedThread
+    ? isDealEmail(fetchedThread, sellerDomain)
+    : null;
 
   const handleSignIn = useCallback(() => {
     const popup = window.open(
@@ -467,7 +480,7 @@ export default function SamplePage() {
       return;
     }
 
-    if (!isDealEmail(fetchedThread)) {
+    if (!isDealEmail(fetchedThread, sellerDomain)) {
       setLiveThread(null);
       lastLiveConvId.current = null;
       return;
@@ -582,7 +595,7 @@ export default function SamplePage() {
             Selected Deal Thread
           </h2>
 
-          <SelectedThreadCard thread={demoThread} />
+          <SelectedThreadCard thread={demoThread} sellerDomain={sellerDomain} />
 
           <ThreadScore
             health={demoHealth}
@@ -692,7 +705,7 @@ export default function SamplePage() {
               Selected Deal Thread
             </h2>
 
-            <SelectedThreadCard thread={t} />
+            <SelectedThreadCard thread={t} sellerDomain={sellerDomain} />
 
             <ThreadScore
               health={liveHealth ?? undefined}
