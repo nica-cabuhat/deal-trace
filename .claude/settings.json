@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls /Users/nicaela.cabuhat/Desktop/*.jpg)"
-    ]
-  }
-}
